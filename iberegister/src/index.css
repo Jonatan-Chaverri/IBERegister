@@ -1,0 +1,48 @@
+.main{
+  font-family: "Montserrat", sans-serif;
+}
+
+/* Add a black background color to the top navigation */
+.topnav {
+  background-color: #333;
+  overflow: hidden;
+}
+
+/* Style the links inside the navigation bar */
+.topnav a {
+  float: left;
+  color: #13ace5;
+  text-align: center;
+  padding: 14px 16px;
+  text-decoration: none;
+  font-size: 20px;
+}
+
+/* Change the color of links on hover */
+.topnav a:hover {
+  background-color: #FFFFFF;
+  color: #13ace5;
+}
+
+/* Add a color to the active/current link */
+.topnav a.active {
+  background-color: #13ace5;
+  color: white;
+}
+
+.header-layout {
+    background-image: url("images/frontpage.jpg");
+    height:250px;
+    width: 100%;
+    min-width: 200px;
+    box-shadow: 0px 2px 2px black;
+    margin: 0px;
+}
+
+.registerForm{
+  padding-top: 20px;
+}
+
+.registerTable{
+  text-align: left;
+}
