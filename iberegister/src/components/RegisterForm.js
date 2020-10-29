@@ -1,6 +1,7 @@
 import React, { Component } from 'react'
 import Datepicker from 'react-datepicker'
 import Firebase from 'firebase'
+import { v4 } from 'uuid';
 
 import "react-datepicker/dist/react-datepicker.css";
 
@@ -15,7 +16,8 @@ class RegisterForm extends Component {
         this.state = {
             reservationDate: nextSunday,
             guests: ["","",""],
-            reservationId: "rnx1"
+            reservationId: v4().substring(0, 4),
+            reservationState: "pending"
         }
         this.addGuestInput = this.addGuestInput.bind(this)
         this.reservationDateToString = this.reservationDateToString.bind(this)
@@ -24,22 +26,45 @@ class RegisterForm extends Component {
         this.handleInputChange = this.handleInputChange.bind(this)
     }
 
-    readGuestData(){
-        let ref = Firebase.database().ref('/1-11-2020/rnx/guests')
+    createReservation(){
+        const {guests} = this.state
+        const {getDatabaseUrl} = this
+        const dbUrl = getDatabaseUrl()
+        let ref = Firebase.database().ref(dbUrl)
+
         ref.on('value', snapshot => {
+            const {reservationState} = this.state
+            if (reservationState == "completed"){
+                return
+            }
             const value = snapshot.val();
-            this.setState({
-                guests: value.split(",")
-            });
+            if (value != null) {
+                // There is some other reservation with same code
+                // Generate a new one and test again
+                const new_reservation_id = v4().substring(0, 4)
+                this.setState({
+                    reservationId: v4().substring(0, 4)
+                });
+                this.createReservation()
+            }
+            else {
+                // Reservation ID is unique, create reservation
+                var filtered = guests.filter(el => {return el.length > 0})
+                let guestStr = filtered.toString()
+                ref.set(guestStr)
+                this.setState({
+                    reservationState: "completed"
+                })
+            }
         })
     }
 
     reservationDateToString(){
         const {reservationDate} = this.state
-        const ye = new Intl.DateTimeFormat('en', { year: 'numeric' }).format(reservationDate);
-        const mo = new Intl.DateTimeFormat('en', { month: 'numeric' }).format(reservationDate);
-        const da = new Intl.DateTimeFormat('en', { day: '2-digit' }).format(reservationDate);
-        return `${ye}-${mo}-${da}`
+        const y = new Intl.DateTimeFormat('en', { year: 'numeric' }).format(reservationDate);
+        const m = new Intl.DateTimeFormat('en', { month: 'numeric' }).format(reservationDate);
+        const d = new Intl.DateTimeFormat('en', { day: '2-digit' }).format(reservationDate);
+        return `${y}-${m}-${d}`
     }
 
     getDatabaseUrl(){
@@ -47,13 +72,6 @@ class RegisterForm extends Component {
         const {reservationDateToString} = this
         const databaseUrl = `/${reservationDateToString()}/${reservationId}/guests`
         return databaseUrl
-    }
-
-    createReservation(){
-        const {guests} = this.state
-        const {getDatabaseUrl} = this
-        let guestStr = guests.toString()
-        Firebase.database().ref(getDatabaseUrl()).set(guestStr);
     }
 
     addGuestInput(){
@@ -66,10 +84,6 @@ class RegisterForm extends Component {
         this.setState({
             guests: guests,
         })
-    }
-
-    componentDidMount(){
-        this.readGuestData()
     }
 
     handleInputChange(index, value){
