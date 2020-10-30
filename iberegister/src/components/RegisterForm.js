@@ -11,10 +11,9 @@ class RegisterForm extends Component {
     constructor(props) {
         super(props)
 
-        const nextSunday = new Date()
-        nextSunday.setDate(nextSunday.getDate() + (14-nextSunday.getDay()) % 7)
         this.state = {
-            reservationDate: nextSunday,
+            reservationDate: "",
+            datesOptions: [""],
             guests: ["","",""],
             reservationId: v4().substring(0, 4),
             reservationState: "pending"
@@ -24,6 +23,20 @@ class RegisterForm extends Component {
         this.getDatabaseUrl = this.getDatabaseUrl.bind(this)
         this.createReservation = this.createReservation.bind(this)
         this.handleInputChange = this.handleInputChange.bind(this)
+        this.getNextFourSundays = this.getNextFourSundays.bind(this)
+        this.handleDateChange = this.handleDateChange.bind(this)
+    }
+
+    getNextFourSundays(){
+        const {reservationDateToString} = this
+        const datesArray = ["", "", "", ""]
+        const currentDate = new Date()
+        for (let dateIndex in datesArray){
+            currentDate.setDate(currentDate.getDate() + (14-currentDate.getDay()) % 7)
+            datesArray[dateIndex] = reservationDateToString(currentDate)
+            currentDate.setDate(currentDate.getDate() + 1)
+        }
+        return datesArray
     }
 
     createReservation(){
@@ -59,18 +72,16 @@ class RegisterForm extends Component {
         })
     }
 
-    reservationDateToString(){
-        const {reservationDate} = this.state
-        const y = new Intl.DateTimeFormat('en', { year: 'numeric' }).format(reservationDate);
-        const m = new Intl.DateTimeFormat('en', { month: 'numeric' }).format(reservationDate);
-        const d = new Intl.DateTimeFormat('en', { day: '2-digit' }).format(reservationDate);
+    reservationDateToString(dateInput){
+        const y = new Intl.DateTimeFormat('en', { year: 'numeric' }).format(dateInput);
+        const m = new Intl.DateTimeFormat('en', { month: 'numeric' }).format(dateInput);
+        const d = new Intl.DateTimeFormat('en', { day: '2-digit' }).format(dateInput);
         return `${y}-${m}-${d}`
     }
 
     getDatabaseUrl(){
-        const {reservationId} = this.state
-        const {reservationDateToString} = this
-        const databaseUrl = `/${reservationDateToString()}/${reservationId}/guests`
+        const {reservationId, reservationDate} = this.state
+        const databaseUrl = `/${reservationDate}/${reservationId}/guests`
         return databaseUrl
     }
 
@@ -94,42 +105,76 @@ class RegisterForm extends Component {
         })
     }
 
+    handleDateChange(event){
+        this.setState({
+            reservationDate: event.target.value
+        })
+    }
+
+    componentDidMount(){
+        const {getNextFourSundays} = this
+        const datesOptions = getNextFourSundays()
+        this.setState({
+            datesOptions: datesOptions,
+            reservationDate: datesOptions[0]
+        })
+    }
+
     render() {
-        const {reservationDate, guests} = this.state
-        const {addGuestInput, createReservation, handleInputChange} = this
+        const {reservationDate, guests, datesOptions} = this.state
+        const {addGuestInput, createReservation, handleInputChange, getNextFourSundays, handleDateChange} = this
         return (
             <div class="registerForm">
-                <table class="registerTable">
-                    <tr>
-                        <th width="50%">Fecha de reservacion</th>
-                        <th width="50%"><Datepicker selected={reservationDate}/></th>
-                    </tr>
-                </table>
-                <div>
-                    <h5>Nombre completo de todas las personas que vendran con ud</h5>
-                    <div>
+                <div class="date-selection-block">
+                    <div class="custom-header-text">Fecha de reservacion</div>
+                    <select class="select-css" value={reservationDate} onChange={handleDateChange}>
                     {
-                        guests.map((guest, index) => {
-                                return (
-                                    <div>
-                                        <input 
-                                            type="text"
-                                            value={guest}
-                                            onChange={
-                                                event => handleInputChange(index, event.target.value)
-                                            }
-                                        /><br/>
-                                    </div>
-                                )
-                            }
-                        )
+                        datesOptions.map(el => {
+                            return (<option value={el}>{el}</option>)
+                        })
                     }
-                        <input type="button" value="+anadir mas" onClick={addGuestInput}></input><br/><br/>
-                        <input type="button" value="Reservar" onClick={createReservation}></input>
-                    </div>
-
+                    </select>
+                    <div class="custom-subtitle">Quedan 70 campos</div>
                 </div>
+                <div class="guest-reservation-block">
+                    <div class="personal-data-block">
+                        <div class="custom-header-text">Datos personales</div>
+                        <table>
+                            <tr>
+                                <th>Nombre</th>
+                                <th><input type="text"/></th>
+                            </tr>
+                            <tr>
+                                <th>Telefono</th>
+                                <th><input type="text"/></th>
+                            </tr>
+                        </table>
+                    </div>
+                    <div class="guests-block">
+                        <div class="custom-header-text">Nombres de acompanantes</div>
+                        <div>
+                        {
+                            guests.map((guest, index) => {
+                                    return (
+                                        <div class="input-block">
+                                            <input 
+                                                type="text"
+                                                value={guest}
+                                                onChange={
+                                                    event => handleInputChange(index, event.target.value)
+                                                }
+                                            /><br/>
+                                        </div>
+                                    )
+                                }
+                            )
+                        }
+                            <input type="button" value="+" class="button-add-more" onClick={addGuestInput}></input><br/><br/>
+                        </div>
 
+                    </div>
+                </div>
+                <input type="button" class="button-add-reserve" value="Reservar" onClick={createReservation}></input>
             </div>
         )
     }

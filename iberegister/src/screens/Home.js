@@ -4,6 +4,7 @@ import Firebase from "firebase"
 import firebase_config from "../config"
 import HeaderBar from '../components/HeaderBar'
 import RegisterForm from '../components/RegisterForm'
+import FooterBar from '../components/Footer'
 
 import logo from '../images/logo.png'
 
@@ -30,6 +31,7 @@ class Home extends Component {
                 </div>
                 <HeaderBar></HeaderBar>
                 <RegisterForm/>
+                <FooterBar></FooterBar>
             </div>
         )
     }
