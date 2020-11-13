@@ -247,5 +247,29 @@ body {
 }
 
 .footer-text{
-  font-size: 15px;
+    font-size: 15px;
+}
+
+.reservation-result-block-container{
+    padding-top: 20px;
+}
+
+.reservation-result-block{
+    padding: 5px 5px 10px 10px;
+    color: white;
+    font-size: 17px;
+    font-weight: bold;
+    border-radius: 5px;
+    background: rgb(126,42,59);
+    background: linear-gradient(86deg, rgba(126,42,59,1) 0%, rgba(196,40,68,1) 49%);
+    max-width: 500px;
+}
+
+.icon-check-circle{
+    color: #20A50B;
+}
+
+.reservation-number-block-warning{
+    font-size: 12px;
+    color: #F6E407;
 }

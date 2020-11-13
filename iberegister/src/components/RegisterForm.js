@@ -3,6 +3,9 @@ import Datepicker from 'react-datepicker'
 import Firebase from 'firebase'
 import { v4 } from 'uuid';
 
+// Check more icons at here https://react-icons.github.io/react-icons/icons?name=fa
+import { FaCheckCircle } from 'react-icons/fa'
+
 import "react-datepicker/dist/react-datepicker.css";
 
 
@@ -15,8 +18,13 @@ class RegisterForm extends Component {
             reservationDate: "",
             datesOptions: [""],
             guests: ["","",""],
+            personalData: {
+                "name": "",
+                "phone": ""
+            },
             reservationId: v4().substring(0, 4),
-            reservationState: "pending"
+            reservationState: "pending",
+            errorMessages: [""]
         }
         this.addGuestInput = this.addGuestInput.bind(this)
         this.reservationDateToString = this.reservationDateToString.bind(this)
@@ -25,6 +33,7 @@ class RegisterForm extends Component {
         this.handleInputChange = this.handleInputChange.bind(this)
         this.getNextFourSundays = this.getNextFourSundays.bind(this)
         this.handleDateChange = this.handleDateChange.bind(this)
+        this.handlePersonalDataChange = this.handlePersonalDataChange.bind(this)
     }
 
     getNextFourSundays(){
@@ -37,6 +46,21 @@ class RegisterForm extends Component {
             currentDate.setDate(currentDate.getDate() + 1)
         }
         return datesArray
+    }
+
+    isValidName(name){
+        const regex = /^[A-Za-z]{1,15}\s[A-Za-z]{1,15}(\s[A-Za-z]{1,15}$|$)/
+        return regex.test(name)
+    }
+
+    isValidPhone(phone){
+        const regex = /^[0-8]{8}$/
+        return regex.test(phone)
+    }
+
+    validateReservation(){
+        const {personalData, guests} = this.state
+
     }
 
     createReservation(){
@@ -111,6 +135,15 @@ class RegisterForm extends Component {
         })
     }
 
+    handlePersonalDataChange(nameValue, phoneValue){
+        this.setState({
+            personalData: {
+                name: nameValue,
+                phone: phoneValue.replace("-", "").replace(" ", "")
+            }
+        })
+    }
+
     componentDidMount(){
         const {getNextFourSundays} = this
         const datesOptions = getNextFourSundays()
@@ -121,8 +154,15 @@ class RegisterForm extends Component {
     }
 
     render() {
-        const {reservationDate, guests, datesOptions} = this.state
-        const {addGuestInput, createReservation, handleInputChange, getNextFourSundays, handleDateChange} = this
+        const {reservationDate, guests, datesOptions, personalData} = this.state
+        const {
+            addGuestInput,
+            createReservation,
+            handleInputChange,
+            getNextFourSundays,
+            handleDateChange,
+            handlePersonalDataChange
+        } = this
         return (
             <div class="registerForm">
                 <div class="date-selection-block">
@@ -142,11 +182,27 @@ class RegisterForm extends Component {
                         <table>
                             <tr>
                                 <th>Nombre</th>
-                                <th><input type="text"/></th>
+                                <th><input 
+                                    type="text"
+                                    value={personalData.name}
+                                    onChange={
+                                        event => handlePersonalDataChange(
+                                            event.target.value,
+                                            personalData.phone
+                                        )
+                                    }/></th>
                             </tr>
                             <tr>
                                 <th>Telefono</th>
-                                <th><input type="text"/></th>
+                                <th><input 
+                                    type="text"
+                                    value={personalData.phone}
+                                    onChange={
+                                        event => handlePersonalDataChange(
+                                            personalData.name,
+                                            event.target.value
+                                        )
+                                    }/></th>
                             </tr>
                         </table>
                     </div>
@@ -174,7 +230,25 @@ class RegisterForm extends Component {
 
                     </div>
                 </div>
-                <input type="button" class="button-add-reserve" value="Reservar" onClick={createReservation}></input>
+                <div>
+                    <input type="button" class="button-add-reserve" value="Reservar" onClick={createReservation}></input>
+                </div>
+                <div class="reservation-result-block-container">
+                    <div class="reservation-result-block">
+                        <div class="reservation-status-block">
+                            <p>Reservacion exitosa  <FaCheckCircle class="icon-check-circle"/></p>
+                        </div>
+                        <div class="reservation-number-block">
+                            <div class="reservation-number-block-warning">
+                                **Es importante que anotes este numero de reservacion, asi como
+                                el dia de la misma, en caso de que quieras hacer cambios despues
+                            </div>
+                            <div>
+                                Numero de reservacion: 333
+                            </div>
+                        </div>
+                    </div>
+                </div>
             </div>
         )
     }
