@@ -1,7 +1,9 @@
 import React, { Component } from 'react'
-import Datepicker from 'react-datepicker'
 import Firebase from 'firebase'
 import { v4 } from 'uuid';
+import {MAX_ALLOWED_GUESTS} from "../config"
+import CustomDatePicker from './CustomDatePicker'
+import GuestsInputForm from './GuestsInputForm'
 
 // Check more icons at here https://react-icons.github.io/react-icons/icons?name=fa
 import { FaCheckCircle, FaTimesCircle } from 'react-icons/fa'
@@ -11,50 +13,47 @@ import "react-datepicker/dist/react-datepicker.css";
 
 class RegisterForm extends Component {
 
-    static PERSONALDATANAME = "personalDataName"
-
     constructor(props) {
         super(props)
 
+        this.datesOptions = ["", "", "", ""]
+        const currentDate = new Date()
+        var y, m, d
+        for (let dateIndex in this.datesOptions){
+            currentDate.setDate(currentDate.getDate() + (14-currentDate.getDay()) % 7)
+            y = new Intl.DateTimeFormat('en', { year: 'numeric' }).format(currentDate);
+            m = new Intl.DateTimeFormat('en', { month: 'numeric' }).format(currentDate);
+            d = new Intl.DateTimeFormat('en', { day: '2-digit' }).format(currentDate);
+            this.datesOptions[dateIndex] = `${y}-${m}-${d}`
+            currentDate.setDate(currentDate.getDate() + 1)
+        }
+
         this.state = {
             reservationDate: "",
-            datesOptions: [""],
+            availableSpace: 0,
             guests: ["","",""],
             personalData: {
                 "name": "",
                 "phone": ""
             },
-            reservationId: v4().substring(0, 4),
+            reservationId: Math.random().toString(36).substr(2, 9),
             reservationState: "pending",
             errorMessages: {
                 personalDataName: false,
                 personalDataPhone: false,
-                guests: [false, false, false]
+                guests: [false, false, false],
+                notAvailableSpace: false
             }
         }
         this.addGuestInput = this.addGuestInput.bind(this)
-        this.reservationDateToString = this.reservationDateToString.bind(this)
-        this.getDatabaseUrl = this.getDatabaseUrl.bind(this)
         this.createReservation = this.createReservation.bind(this)
         this.handleInputChange = this.handleInputChange.bind(this)
-        this.getNextFourSundays = this.getNextFourSundays.bind(this)
         this.handleDateChange = this.handleDateChange.bind(this)
         this.handlePersonalDataChange = this.handlePersonalDataChange.bind(this)
         this.isValidName = this.isValidName.bind(this)
         this.isValidPhone = this.isValidPhone.bind(this)
         this.getReservationErrors = this.getReservationErrors.bind(this)
-    }
-
-    getNextFourSundays(){
-        const {reservationDateToString} = this
-        const datesArray = ["", "", "", ""]
-        const currentDate = new Date()
-        for (let dateIndex in datesArray){
-            currentDate.setDate(currentDate.getDate() + (14-currentDate.getDay()) % 7)
-            datesArray[dateIndex] = reservationDateToString(currentDate)
-            currentDate.setDate(currentDate.getDate() + 1)
-        }
-        return datesArray
+        this.checkAvailableSpace = this.checkAvailableSpace.bind(this)
     }
 
     isValidName(name){
@@ -69,6 +68,9 @@ class RegisterForm extends Component {
 
     getReservationErrors(){
         const {errorMessages, personalData} = this.state
+        if (errorMessages.notAvailableSpace){
+            return "No hay espacio disponible para todos los invitados"
+        }
         if (errorMessages.personalDataName || !personalData.name){
             return "El nombre que introdujo en datos personales no es valido"
         }
@@ -84,7 +86,15 @@ class RegisterForm extends Component {
     }
 
     createReservation(){
-        const {guests} = this.state
+        const {
+            guests,
+            personalData,
+            reservationDate,
+            reservationId,
+            availableSpace,
+            errorMessages
+        } = this.state
+
         const {getDatabaseUrl, getReservationErrors} = this
         const reservationErrors = getReservationErrors()
         if (reservationErrors){
@@ -93,47 +103,28 @@ class RegisterForm extends Component {
             })
             return
         }
-        const dbUrl = getDatabaseUrl()
-        let ref = Firebase.database().ref(dbUrl)
 
-        ref.on('value', snapshot => {
-            const {reservationState} = this.state
-            if (reservationState == "completed"){
-                return
-            }
-            const value = snapshot.val();
-            if (value != null) {
-                // There is some other reservation with same code
-                // Generate a new one and test again
-                const new_reservation_id = v4().substring(0, 4)
-                this.setState({
-                    reservationId: v4().substring(0, 4)
-                });
-                this.createReservation()
-            }
-            else {
-                // Reservation ID is unique, create reservation
-                var filtered = guests.filter(el => {return el.length > 0})
-                let guestStr = filtered.toString()
-                ref.set(guestStr)
-                this.setState({
-                    reservationState: "completed"
-                })
-            }
+        var filtered = guests.filter(el => {return el.length > 0})
+        filtered.push(personalData.name)
+        if (filtered.length > availableSpace){
+            errorMessages.notAvailableSpace = true
+            this.setState({
+                errorMessages: errorMessages,
+                reservationState: "failed"
+            })
+            return
+        }
+        const guestStr = filtered.toString()
+        const documentToSave = {
+            guests: guestStr,
+            name: personalData.name,
+            phone: personalData.phone
+        }
+        const dbUrl = `/${reservationDate}/${reservationId}`
+        let ref = Firebase.database().ref(dbUrl).set(documentToSave)
+        this.setState({
+            reservationState: "completed"
         })
-    }
-
-    reservationDateToString(dateInput){
-        const y = new Intl.DateTimeFormat('en', { year: 'numeric' }).format(dateInput);
-        const m = new Intl.DateTimeFormat('en', { month: 'numeric' }).format(dateInput);
-        const d = new Intl.DateTimeFormat('en', { day: '2-digit' }).format(dateInput);
-        return `${y}-${m}-${d}`
-    }
-
-    getDatabaseUrl(){
-        const {reservationId, reservationDate} = this.state
-        const databaseUrl = `/${reservationDate}/${reservationId}/guests`
-        return databaseUrl
     }
 
     addGuestInput(){
@@ -155,6 +146,7 @@ class RegisterForm extends Component {
         const{isValidName} = this
         errorMessages.guests[index] = value ? !isValidName(value) : false
         guests[index] = value
+        errorMessages.notAvailableSpace = false
         this.setState({
             guests: guests,
             errorMessages: errorMessages
@@ -162,9 +154,8 @@ class RegisterForm extends Component {
     }
 
     handleDateChange(event){
-        this.setState({
-            reservationDate: event.target.value
-        })
+        const {checkAvailableSpace} = this
+        checkAvailableSpace(event.target.value)
     }
 
     handlePersonalDataChange(nameValue, phoneValue){
@@ -183,104 +174,73 @@ class RegisterForm extends Component {
         })
     }
 
-    componentDidMount(){
-        const {getNextFourSundays} = this
-        const datesOptions = getNextFourSundays()
-        this.setState({
-            datesOptions: datesOptions,
-            reservationDate: datesOptions[0]
+    checkAvailableSpace(selectedDate){
+        const dbUrl = `/${selectedDate}`
+        let ref = Firebase.database().ref(dbUrl)
+
+        ref.on('value', snapshot => {
+            var reservations = snapshot.val();
+            if (reservations == null) {
+                reservations = {}
+            }
+            var currentGuests = 0
+            for (var reservation in reservations){
+                const guestsFound = reservations[reservation].guests.split(",")
+                currentGuests = currentGuests + guestsFound.length
+            }
+            this.setState({
+                reservationDate: selectedDate,
+                availableSpace: MAX_ALLOWED_GUESTS - currentGuests
+            })
         })
     }
 
+    componentDidMount(){
+        const {checkAvailableSpace, datesOptions} = this
+        checkAvailableSpace(this.datesOptions[0])
+    }
+
     render() {
-        const {reservationDate, reservationState, guests, datesOptions, personalData, errorMessages} = this.state
+        const {
+            reservationDate,
+            reservationState,
+            guests,
+            personalData,
+            errorMessages,
+            availableSpace,
+            reservationId
+        } = this.state
         const {
             addGuestInput,
             createReservation,
             handleInputChange,
-            getNextFourSundays,
             handleDateChange,
             handlePersonalDataChange,
-            getReservationErrors
+            getReservationErrors,
+            datesOptions,
+            checkAvailableSpace
         } = this
         return (
             <div class="registerForm">
                 <div class="date-selection-block">
-                    <div class="custom-header-text">Fecha de reservacion</div>
-                    <select class="select-css" value={reservationDate} onChange={handleDateChange}>
-                    {
-                        datesOptions.map(el => {
-                            return (<option value={el}>{el}</option>)
-                        })
-                    }
-                    </select>
-                    <div class="custom-subtitle">Quedan 70 campos</div>
+                    <CustomDatePicker selectedDate={reservationDate} onDateSelected={handleDateChange}/>
+                    <div class="custom-subtitle">Quedan {availableSpace} campos</div>
                 </div>
-                <div class="guest-reservation-block">
-                    <div class="personal-data-block">
-                        <div class="custom-header-text">Datos personales</div>
-                        <table>
-                            <tr>
-                                <th>Nombre</th>
-                                <th className={errorMessages.personalDataName ? "input-error" : ""}><input 
-                                    type="text"
-                                    value={personalData.name}
-                                    onChange={
-                                        event => handlePersonalDataChange(
-                                            event.target.value,
-                                            personalData.phone
-                                        )
-                                    }/></th>
-                            </tr>
-                            <tr>
-                                <th>Telefono</th>
-                                <th className={errorMessages.personalDataPhone ? "input-error" : ""}><input 
-                                    type="text"
-                                    value={personalData.phone}
-                                    onChange={
-                                        event => handlePersonalDataChange(
-                                            personalData.name,
-                                            event.target.value
-                                        )
-                                    }/></th>
-                            </tr>
-                        </table>
-                    </div>
-                    <div class="guests-block">
-                        <div class="custom-header-text">Nombres de acompanantes</div>
-                        <div>
-                        {
-                            guests.map((guest, index) => {
-                                    return (
-                                        <div class={errorMessages.guests[index] ? "input-error" : "input-block"}>
-                                            <input 
-                                                type="text"
-                                                value={guest}
-                                                onChange={
-                                                    event => handleInputChange(index, event.target.value)
-                                                }
-                                            /><br/>
-                                        </div>
-                                    )
-                                }
-                            )
-                        }
-                            <input 
-                                type="button"
-                                value="+"
-                                class="button-add-more"
-                                disabled={guests.length >= 10 || reservationState == "completed"}
-                                onClick={addGuestInput}></input><br/><br/>
-                        </div>
-
-                    </div>
-                </div>
+                <GuestsInputForm
+                    personalData={personalData}
+                    guests={guests}
+                    errorMessages={errorMessages}
+                    disabled={reservationState == "completed" || availableSpace == 0}
+                    handlePersonalDataChange={handlePersonalDataChange}
+                    handleGuestInputChange={handleInputChange}
+                    onClickAddGuest={addGuestInput}
+                />
                 <div>
                     <input 
                         type="button" 
                         class="button-add-reserve"
                         value="Reservar"
-                        disabled={reservationState == "completed"}
+                        disabled={reservationState == "completed" || availableSpace == 0}
                         onClick={createReservation}></input>
                 </div>
                 <div class="reservation-result-block-container">
@@ -300,7 +260,7 @@ class RegisterForm extends Component {
                                                 el dia de la misma, en caso de que quieras hacer cambios despues
                                             </div>
                                             <div>
-                                                Numero de reservacion: 333
+                                                Numero de reservacion: {reservationId}
                                             </div>
                                         </div> :
                                         <div class="reservation-number-block-error">
