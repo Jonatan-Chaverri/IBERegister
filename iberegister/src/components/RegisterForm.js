@@ -4,12 +4,14 @@ import Firebase from 'firebase'
 import { v4 } from 'uuid';
 
 // Check more icons at here https://react-icons.github.io/react-icons/icons?name=fa
-import { FaCheckCircle } from 'react-icons/fa'
+import { FaCheckCircle, FaTimesCircle } from 'react-icons/fa'
 
 import "react-datepicker/dist/react-datepicker.css";
 
 
 class RegisterForm extends Component {
+
+    static PERSONALDATANAME = "personalDataName"
 
     constructor(props) {
         super(props)
@@ -24,7 +26,11 @@ class RegisterForm extends Component {
             },
             reservationId: v4().substring(0, 4),
             reservationState: "pending",
-            errorMessages: [""]
+            errorMessages: {
+                personalDataName: false,
+                personalDataPhone: false,
+                guests: [false, false, false]
+            }
         }
         this.addGuestInput = this.addGuestInput.bind(this)
         this.reservationDateToString = this.reservationDateToString.bind(this)
@@ -34,6 +40,9 @@ class RegisterForm extends Component {
         this.getNextFourSundays = this.getNextFourSundays.bind(this)
         this.handleDateChange = this.handleDateChange.bind(this)
         this.handlePersonalDataChange = this.handlePersonalDataChange.bind(this)
+        this.isValidName = this.isValidName.bind(this)
+        this.isValidPhone = this.isValidPhone.bind(this)
+        this.getReservationErrors = this.getReservationErrors.bind(this)
     }
 
     getNextFourSundays(){
@@ -58,14 +67,32 @@ class RegisterForm extends Component {
         return regex.test(phone)
     }
 
-    validateReservation(){
-        const {personalData, guests} = this.state
-
+    getReservationErrors(){
+        const {errorMessages, personalData} = this.state
+        if (errorMessages.personalDataName || !personalData.name){
+            return "El nombre que introdujo en datos personales no es valido"
+        }
+        if (errorMessages.personalDataPhone || !personalData.phone){
+            return "El telefono que introdujo en datos personales no es valido"
+        }
+        const guestsValues = Object.values(errorMessages.guests)
+        const guestError = guestsValues.indexOf(true)
+        if (guestError != -1){
+            return `El nombre del invitado ${guestError + 1} no es valido`
+        }
+        return false
     }
 
     createReservation(){
         const {guests} = this.state
-        const {getDatabaseUrl} = this
+        const {getDatabaseUrl, getReservationErrors} = this
+        const reservationErrors = getReservationErrors()
+        if (reservationErrors){
+            this.setState({
+                reservationState: "failed"
+            })
+            return
+        }
         const dbUrl = getDatabaseUrl()
         let ref = Firebase.database().ref(dbUrl)
 
@@ -110,22 +137,27 @@ class RegisterForm extends Component {
     }
 
     addGuestInput(){
-        let {guests} = this.state
+        let {guests, errorMessages} = this.state
         if (guests.length >= 10){
             // TODO add error message
             return
         }
         guests.push("")
+        errorMessages.guests.push(false)
         this.setState({
-            guests: guests,
+            errorMessages: errorMessages,
+            guests: guests
         })
     }
 
     handleInputChange(index, value){
-        let {guests} = this.state
+        const {guests, errorMessages} = this.state
+        const{isValidName} = this
+        errorMessages.guests[index] = value ? !isValidName(value) : false
         guests[index] = value
         this.setState({
-            guests: guests
+            guests: guests,
+            errorMessages: errorMessages
         })
     }
 
@@ -136,10 +168,17 @@ class RegisterForm extends Component {
     }
 
     handlePersonalDataChange(nameValue, phoneValue){
+        const{errorMessages} = this.state
+        const{isValidName, isValidPhone} = this
+        const formattedPhone = phoneValue.replace("-", "").replace(" ", "")
+
+        errorMessages.personalDataName = nameValue ? !isValidName(nameValue) : false
+        errorMessages.personalDataPhone = formattedPhone ? !isValidPhone(formattedPhone) : false
         this.setState({
+            errorMessages: errorMessages,
             personalData: {
                 name: nameValue,
-                phone: phoneValue.replace("-", "").replace(" ", "")
+                phone: formattedPhone
             }
         })
     }
@@ -154,14 +193,15 @@ class RegisterForm extends Component {
     }
 
     render() {
-        const {reservationDate, guests, datesOptions, personalData} = this.state
+        const {reservationDate, reservationState, guests, datesOptions, personalData, errorMessages} = this.state
         const {
             addGuestInput,
             createReservation,
             handleInputChange,
             getNextFourSundays,
             handleDateChange,
-            handlePersonalDataChange
+            handlePersonalDataChange,
+            getReservationErrors
         } = this
         return (
             <div class="registerForm">
@@ -182,7 +222,7 @@ class RegisterForm extends Component {
                         <table>
                             <tr>
                                 <th>Nombre</th>
-                                <th><input 
+                                <th className={errorMessages.personalDataName ? "input-error" : ""}><input 
                                     type="text"
                                     value={personalData.name}
                                     onChange={
@@ -194,7 +234,7 @@ class RegisterForm extends Component {
                             </tr>
                             <tr>
                                 <th>Telefono</th>
-                                <th><input 
+                                <th className={errorMessages.personalDataPhone ? "input-error" : ""}><input 
                                     type="text"
                                     value={personalData.phone}
                                     onChange={
@@ -212,7 +252,7 @@ class RegisterForm extends Component {
                         {
                             guests.map((guest, index) => {
                                     return (
-                                        <div class="input-block">
+                                        <div class={errorMessages.guests[index] ? "input-error" : "input-block"}>
                                             <input 
                                                 type="text"
                                                 value={guest}
@@ -225,29 +265,51 @@ class RegisterForm extends Component {
                                 }
                             )
                         }
-                            <input type="button" value="+" class="button-add-more" onClick={addGuestInput}></input><br/><br/>
+                            <input 
+                                type="button"
+                                value="+"
+                                class="button-add-more"
+                                disabled={guests.length >= 10 || reservationState == "completed"}
+                                onClick={addGuestInput}></input><br/><br/>
                         </div>
 
                     </div>
                 </div>
                 <div>
-                    <input type="button" class="button-add-reserve" value="Reservar" onClick={createReservation}></input>
+                    <input 
+                        type="button" 
+                        class="button-add-reserve"
+                        value="Reservar"
+                        disabled={reservationState == "completed"}
+                        onClick={createReservation}></input>
                 </div>
                 <div class="reservation-result-block-container">
-                    <div class="reservation-result-block">
-                        <div class="reservation-status-block">
-                            <p>Reservacion exitosa  <FaCheckCircle class="icon-check-circle"/></p>
-                        </div>
-                        <div class="reservation-number-block">
-                            <div class="reservation-number-block-warning">
-                                **Es importante que anotes este numero de reservacion, asi como
-                                el dia de la misma, en caso de que quieras hacer cambios despues
+                {
+                    reservationState != "pending" ?
+                            <div class="reservation-result-block">
+                                <div class="reservation-status-block">
+                                    {reservationState == "completed"? 
+                                      <p>Reservacion exitosa  <FaCheckCircle class="icon-check-circle"/></p>:
+                                      <p>Reservacion fallida <FaTimesCircle class="icon-fail-circle"/></p> }
+                                </div>
+                                {
+                                    reservationState == "completed"?
+                                        <div class="reservation-number-block">
+                                            <div class="reservation-number-block-warning">
+                                                **Es importante que anotes este numero de reservacion, asi como
+                                                el dia de la misma, en caso de que quieras hacer cambios despues
+                                            </div>
+                                            <div>
+                                                Numero de reservacion: 333
+                                            </div>
+                                        </div> :
+                                        <div class="reservation-number-block-error">
+                                            {getReservationErrors()}
+                                        </div>
+                                }
                             </div>
-                            <div>
-                                Numero de reservacion: 333
-                            </div>
-                        </div>
-                    </div>
+                    : <div class="reservation-result-hidden">&nbsp;</div>
+                }
                 </div>
             </div>
         )

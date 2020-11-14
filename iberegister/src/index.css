@@ -193,8 +193,8 @@ body {
   padding-bottom: 5px;
 }
 
-.button-add-more{
-  background-color: #898989;
+.button-add-more:enabled{
+  background-color: #38AF21;
   font-size: 20px;
   font-weight: bold;
   color: white;
@@ -205,7 +205,19 @@ body {
   text-shadow: 0 1px 0 rgba(0,0,0,0.15);
 }
 
-.button-add-more:hover{
+.button-add-more:disabled{
+  background-color: #807C7C;
+  font-size: 20px;
+  font-weight: bold;
+  color: white;
+  padding: 0px 20px 0px 20px;
+  border: 1px solid rgba(0,0,0,0.21);
+  border-bottom: 4px solid rgba(0,0,0,0.21);
+  border-radius: 4px;
+  text-shadow: 0 1px 0 rgba(0,0,0,0.15);
+}
+
+.button-add-more:hover:enabled{
   background-color: #FFF;
   font-size: 20px;
   color: #13ace5;
@@ -228,7 +240,19 @@ body {
   border-radius: 4px;
 }
 
-.button-add-reserve:hover{
+.button-add-reserve:disabled{
+  background-color: #807C7C;
+  font-size: 17px;
+  font-family: "Raleway", sans-serif;
+  font-weight: bold;
+  color: white;
+  padding: 3px 20px 3px 20px;
+  border: 1px solid rgba(0,0,0,0.21);
+  border-bottom: 4px solid rgba(0,0,0,0.21);
+  border-radius: 4px;
+}
+
+.button-add-reserve:hover:enabled{
   background-color: white;
   font-size: 17px;
   color: #13ace5;
@@ -256,20 +280,43 @@ body {
 
 .reservation-result-block{
     padding: 5px 5px 10px 10px;
-    color: white;
+    color: black;
     font-size: 17px;
     font-weight: bold;
     border-radius: 5px;
-    background: rgb(126,42,59);
-    background: linear-gradient(86deg, rgba(126,42,59,1) 0%, rgba(196,40,68,1) 49%);
+    background: rgb(244,242,242);
+    background: radial-gradient(circle, rgba(244,242,242,1) 0%, rgba(224,217,218,1) 71%);
     max-width: 500px;
+    min-height: 110px;
 }
 
 .icon-check-circle{
     color: #20A50B;
 }
 
+.icon-fail-circle{
+    color: red;
+}
+
 .reservation-number-block-warning{
     font-size: 12px;
-    color: #F6E407;
+    color: #7E5C24;
+}
+
+.reservation-number-block-error{
+    font-size: 15px;
+    color: #AA0E04;
+}
+
+.input-error{
+  background: rgba(196, 3, 3, 0.6);
+}
+
+.reservation-result-hidden{
+  padding: 5px 5px 10px 10px;
+  min-height: 110px;
+  max-width: 500px;
+  border-radius: 5px;
+  background: rgb(244,242,242);
+  background: radial-gradient(circle, rgba(244,242,242,1) 0%, rgba(224,217,218,1) 71%);
 }
