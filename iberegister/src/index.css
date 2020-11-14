@@ -11,7 +11,7 @@ body {
 }
 
 /* Style the links inside the navigation bar */
-.topnav a {
+.topnav label {
   float: left;
   color: white;
   text-align: center;
@@ -21,13 +21,13 @@ body {
 }
 
 /* Change the color of links on hover */
-.topnav a:hover {
+.topnav label:hover {
   background-color: #FFFFFF;
   color: #13ace5;
 }
 
 /* Add a color to the active/current link */
-.topnav a.active {
+.topnav label.active {
   background-color: #13ace5;
   color: white;
 }

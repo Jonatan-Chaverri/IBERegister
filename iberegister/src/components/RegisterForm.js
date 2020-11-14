@@ -1,6 +1,5 @@
 import React, { Component } from 'react'
 import Firebase from 'firebase'
-import { v4 } from 'uuid';
 import {MAX_ALLOWED_GUESTS} from "../config"
 import CustomDatePicker from './CustomDatePicker'
 import GuestsInputForm from './GuestsInputForm'
@@ -16,20 +15,15 @@ class RegisterForm extends Component {
     constructor(props) {
         super(props)
 
-        this.datesOptions = ["", "", "", ""]
+        // The initial reservation date is always next sunday
         const currentDate = new Date()
-        var y, m, d
-        for (let dateIndex in this.datesOptions){
-            currentDate.setDate(currentDate.getDate() + (14-currentDate.getDay()) % 7)
-            y = new Intl.DateTimeFormat('en', { year: 'numeric' }).format(currentDate);
-            m = new Intl.DateTimeFormat('en', { month: 'numeric' }).format(currentDate);
-            d = new Intl.DateTimeFormat('en', { day: '2-digit' }).format(currentDate);
-            this.datesOptions[dateIndex] = `${y}-${m}-${d}`
-            currentDate.setDate(currentDate.getDate() + 1)
-        }
+        currentDate.setDate(currentDate.getDate() + (14-currentDate.getDay()) % 7)
+        const y = new Intl.DateTimeFormat('en', { year: 'numeric' }).format(currentDate);
+        const m = new Intl.DateTimeFormat('en', { month: 'numeric' }).format(currentDate);
+        const d = new Intl.DateTimeFormat('en', { day: '2-digit' }).format(currentDate);
 
         this.state = {
-            reservationDate: "",
+            reservationDate: `${y}-${m}-${d}`,
             availableSpace: 0,
             guests: ["","",""],
             personalData: {
@@ -196,8 +190,8 @@ class RegisterForm extends Component {
     }
 
     componentDidMount(){
-        const {checkAvailableSpace, datesOptions} = this
-        checkAvailableSpace(this.datesOptions[0])
+        const {checkAvailableSpace, reservationDate} = this
+        checkAvailableSpace(reservationDate)
     }
 
     render() {
@@ -217,7 +211,6 @@ class RegisterForm extends Component {
             handleDateChange,
             handlePersonalDataChange,
             getReservationErrors,
-            datesOptions,
             checkAvailableSpace
         } = this
         return (

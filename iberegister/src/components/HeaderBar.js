@@ -4,10 +4,11 @@ import { FaCalendarPlus, FaEdit } from 'react-icons/fa'
 
 class HeaderBar extends Component {
     render() {
+        const {highlightReservation, handleReservation, handleEdit} = this.props
         return (
             <div class="topnav">
-              <a class="active" href="#home"><FaCalendarPlus/> Crear reservacion</a>
-              <a href="#cancellation"><FaEdit/> Editar reservacion</a>
+              <label type="button" class={highlightReservation ? "active": "inactive"} onClick={handleReservation}><FaCalendarPlus/> Crear reservacion</label>
+              <label type="button" class={highlightReservation ? "inactive": "active"} onClick={handleEdit} ><FaEdit/> Editar reservacion</label>
             </div>
         )
     }
