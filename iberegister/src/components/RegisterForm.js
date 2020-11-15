@@ -190,7 +190,8 @@ class RegisterForm extends Component {
     }
 
     componentDidMount(){
-        const {checkAvailableSpace, reservationDate} = this
+        const {reservationDate} = this.state
+        const {checkAvailableSpace} = this
         checkAvailableSpace(reservationDate)
     }
 
@@ -223,7 +224,7 @@ class RegisterForm extends Component {
                     personalData={personalData}
                     guests={guests}
                     errorMessages={errorMessages}
-                    disabled={reservationState == "completed" || availableSpace == 0}
+                    disabled={reservationState == "completed" || availableSpace <= 0}
                     handlePersonalDataChange={handlePersonalDataChange}
                     handleGuestInputChange={handleInputChange}
                     onClickAddGuest={addGuestInput}
@@ -233,7 +234,7 @@ class RegisterForm extends Component {
                         type="button" 
                         class="button-add-reserve"
                         value="Reservar"
-                        disabled={reservationState == "completed" || availableSpace == 0}
+                        disabled={reservationState == "completed" || availableSpace <= 0}
                         onClick={createReservation}></input>
                 </div>
                 <div class="reservation-result-block-container">

@@ -263,6 +263,40 @@ body {
   border-radius: 4px;
 }
 
+.button-warning{
+  background-color: #DE300B;
+  font-size: 17px;
+  font-family: "Raleway", sans-serif;
+  font-weight: bold;
+  color: white;
+  padding: 3px 20px 3px 20px;
+  border: 1px solid rgba(0,0,0,0.21);
+  border-bottom: 4px solid rgba(0,0,0,0.21);
+  border-radius: 4px;
+}
+
+.button-warning:hover:enabled{
+  background-color: #E7E7E7;
+  font-size: 17px;
+  color: black;
+  padding: 3px 20px 3px 20px;
+  border: 1px solid rgba(0,0,0,0.21);
+  border-bottom: 4px solid rgba(0,0,0,0.21);
+  border-radius: 4px;
+}
+
+.button-warning:disabled{
+  background-color: #807C7C;
+  font-size: 17px;
+  font-family: "Raleway", sans-serif;
+  font-weight: bold;
+  color: white;
+  padding: 3px 20px 3px 20px;
+  border: 1px solid rgba(0,0,0,0.21);
+  border-bottom: 4px solid rgba(0,0,0,0.21);
+  border-radius: 4px;
+}
+
 .bottomnav{
     height: 100px;
     width: 100%;
@@ -320,4 +354,33 @@ body {
   border-radius: 5px;
   background: rgb(244,242,242);
   background: radial-gradient(circle, rgba(244,242,242,1) 0%, rgba(224,217,218,1) 71%);
+}
+
+.main-block{
+  padding-top: 20px;
+  padding-bottom: 20px;
+}
+
+.horizontal-block{
+  display: inline-block;
+  padding-right: 10px;
+}
+
+.horizontal-space-block{
+  padding-right: 40px;
+}
+
+.error-message{
+  color:red;
+  font-size: 15px;
+}
+
+.text-success {
+  color: #02682D;
+  text-decoration: underline;
+}
+
+.text-error{
+  color: red;
+  text-decoration: underline;
 }
