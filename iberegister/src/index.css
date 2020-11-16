@@ -278,7 +278,7 @@ body {
 
 .button-add-reserve{
   background-color: #13ace5;
-  font-size: 17px;
+  font-size: 15px;
   font-family: "Raleway", sans-serif;
   font-weight: bold;
   color: white;
@@ -290,7 +290,7 @@ body {
 
 .button-add-reserve:disabled{
   background-color: #807C7C;
-  font-size: 17px;
+  font-size: 15px;
   font-family: "Raleway", sans-serif;
   font-weight: bold;
   color: white;
@@ -302,7 +302,7 @@ body {
 
 .button-add-reserve:hover:enabled{
   background-color: white;
-  font-size: 17px;
+  font-size: 15px;
   color: #13ace5;
   padding: 3px 20px 3px 20px;
   border: 1px solid rgba(0,0,0,0.21);
@@ -312,7 +312,7 @@ body {
 
 .button-warning{
   background-color: #DE300B;
-  font-size: 17px;
+  font-size: 15px;
   font-family: "Raleway", sans-serif;
   font-weight: bold;
   color: white;
@@ -324,7 +324,7 @@ body {
 
 .button-warning:hover:enabled{
   background-color: #E7E7E7;
-  font-size: 17px;
+  font-size: 15px;
   color: black;
   padding: 3px 20px 3px 20px;
   border: 1px solid rgba(0,0,0,0.21);
@@ -334,7 +334,7 @@ body {
 
 .button-warning:disabled{
   background-color: #807C7C;
-  font-size: 17px;
+  font-size: 15px;
   font-family: "Raleway", sans-serif;
   font-weight: bold;
   color: white;
@@ -418,8 +418,12 @@ body {
     color: #AA0E04;
 }
 
-.input-error{
+.input-error-container{
   background: rgba(196, 3, 3, 0.6);
+}
+
+.input-error{
+  padding: 3px 3px 3px 3px;
 }
 
 .reservation-result-hidden{
@@ -480,4 +484,11 @@ body {
 .text-error{
   color: red;
   text-decoration: underline;
+}
+
+.text-input{
+  border-radius: 6px;
+  font-size: 15px;
+  padding-top: 3px;
+  padding-bottom: 3px;
 }

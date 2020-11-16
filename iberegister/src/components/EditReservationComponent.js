@@ -286,7 +286,7 @@ class EditReservationForm extends Component {
                     </div>
                     <div class="horizontal-block horizontal-space-block">
                         <div class="custom-header-text">Código de reservación</div>
-                        <input type="text" value={reservationId} onChange={handleReservationChange}/>
+                        <input className="text-input" type="text" value={reservationId} onChange={handleReservationChange}/>
                     </div>
                 </div>
                 <div class="main-block">

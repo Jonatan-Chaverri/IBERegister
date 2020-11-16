@@ -3,6 +3,7 @@
   "version": "1.0.0",
   "repository": "https://github.com/Jonatan-Chaverri/IBERegister",
   "author": "Jonatan Chaverri",
+  "homepage": ".",
   "license": "MIT",
   "dependencies": {
     "firebase": "^8.0.0",
