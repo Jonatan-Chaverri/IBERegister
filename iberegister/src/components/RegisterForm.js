@@ -1,8 +1,29 @@
 import React, { Component } from 'react'
 import Firebase from 'firebase'
-import {MAX_ALLOWED_GUESTS} from "../config"
+import {MAX_ALLOWED_GUESTS, MAX_GUESTS_PER_RESERVATION} from "../config"
 import CustomDatePicker from './CustomDatePicker'
 import GuestsInputForm from './GuestsInputForm'
+
+import {
+    NO_ROOM_ERROR,
+    INVALID_NAME_ERROR,
+    INVALID_PHONE_ERROR,
+    FAILED_STATE,
+    COMPLETED_STATE,
+    PENDING_STATE,
+    FOUND_STATE,
+    DELETED_STATE,
+    INVALID_RESERVATION_CODE,
+    RESERVATION_NOT_FOUND_ERROR,
+    UPDATE_BUTTON,
+    DELETE_RESERVATION_BUTTON,
+    UPDATE_SUCCESS,
+    DELETE_SUCCESS,
+    RESERVATION_BUTTON,
+    RESERVATION_SUCCESS,
+    RESERVATION_FAILED,
+    RESERVATION_WARNING
+} from "../constants"
 
 // Check more icons at here https://react-icons.github.io/react-icons/icons?name=fa
 import { FaCheckCircle, FaTimesCircle } from 'react-icons/fa'
@@ -31,7 +52,7 @@ class RegisterForm extends Component {
                 "phone": ""
             },
             reservationId: Math.random().toString(36).substr(2, 9),
-            reservationState: "pending",
+            reservationState: PENDING_STATE,
             errorMessages: {
                 personalDataName: false,
                 personalDataPhone: false,
@@ -63,18 +84,18 @@ class RegisterForm extends Component {
     getReservationErrors(){
         const {errorMessages, personalData} = this.state
         if (errorMessages.notAvailableSpace){
-            return "No hay espacio disponible para todos los invitados"
+            return NO_ROOM_ERROR
         }
         if (errorMessages.personalDataName || !personalData.name){
-            return "El nombre que introdujo en datos personales no es valido"
+            return INVALID_NAME_ERROR
         }
         if (errorMessages.personalDataPhone || !personalData.phone){
-            return "El telefono que introdujo en datos personales no es valido"
+            return INVALID_PHONE_ERROR
         }
         const guestsValues = Object.values(errorMessages.guests)
         const guestError = guestsValues.indexOf(true)
         if (guestError != -1){
-            return `El nombre del invitado ${guestError + 1} no es valido`
+            return `El nombre del invitado ${guestError + 1} no es válido`
         }
         return false
     }
@@ -93,7 +114,7 @@ class RegisterForm extends Component {
         const reservationErrors = getReservationErrors()
         if (reservationErrors){
             this.setState({
-                reservationState: "failed"
+                reservationState: FAILED_STATE
             })
             return
         }
@@ -104,7 +125,7 @@ class RegisterForm extends Component {
             errorMessages.notAvailableSpace = true
             this.setState({
                 errorMessages: errorMessages,
-                reservationState: "failed"
+                reservationState: FAILED_STATE
             })
             return
         }
@@ -117,14 +138,13 @@ class RegisterForm extends Component {
         const dbUrl = `/${reservationDate}/${reservationId}`
         let ref = Firebase.database().ref(dbUrl).set(documentToSave)
         this.setState({
-            reservationState: "completed"
+            reservationState: COMPLETED_STATE
         })
     }
 
     addGuestInput(){
         let {guests, errorMessages} = this.state
-        if (guests.length >= 10){
-            // TODO add error message
+        if (guests.length >= MAX_GUESTS_PER_RESERVATION){
             return
         }
         guests.push("")
@@ -224,7 +244,7 @@ class RegisterForm extends Component {
                     personalData={personalData}
                     guests={guests}
                     errorMessages={errorMessages}
-                    disabled={reservationState == "completed" || availableSpace <= 0}
+                    disabled={reservationState == COMPLETED_STATE || availableSpace <= 0}
                     handlePersonalDataChange={handlePersonalDataChange}
                     handleGuestInputChange={handleInputChange}
                     onClickAddGuest={addGuestInput}
@@ -233,28 +253,27 @@ class RegisterForm extends Component {
                     <input 
                         type="button" 
                         class="button-add-reserve"
-                        value="Reservar"
-                        disabled={reservationState == "completed" || availableSpace <= 0}
+                        value={RESERVATION_BUTTON}
+                        disabled={reservationState == COMPLETED_STATE || availableSpace <= 0}
                         onClick={createReservation}></input>
                 </div>
                 <div class="reservation-result-block-container">
                 {
-                    reservationState != "pending" ?
+                    reservationState != PENDING_STATE ?
                             <div class="reservation-result-block">
                                 <div class="reservation-status-block">
-                                    {reservationState == "completed"? 
-                                      <p>Reservacion exitosa  <FaCheckCircle class="icon-check-circle"/></p>:
-                                      <p>Reservacion fallida <FaTimesCircle class="icon-fail-circle"/></p> }
+                                    {reservationState == COMPLETED_STATE? 
+                                      <p>{RESERVATION_SUCCESS}  <FaCheckCircle class="icon-check-circle"/></p>:
+                                      <p>{RESERVATION_FAILED} <FaTimesCircle class="icon-fail-circle"/></p> }
                                 </div>
                                 {
-                                    reservationState == "completed"?
+                                    reservationState == COMPLETED_STATE ?
                                         <div class="reservation-number-block">
                                             <div class="reservation-number-block-warning">
-                                                **Es importante que anotes este numero de reservacion, asi como
-                                                el dia de la misma, en caso de que quieras hacer cambios despues
+                                                {RESERVATION_WARNING}
                                             </div>
                                             <div>
-                                                Numero de reservacion: {reservationId}
+                                                Còdigo de reservaciòn: {reservationId}
                                             </div>
                                         </div> :
                                         <div class="reservation-number-block-error">

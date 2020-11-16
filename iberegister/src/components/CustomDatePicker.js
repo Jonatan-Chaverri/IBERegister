@@ -23,7 +23,7 @@ class CustomDatePicker extends Component {
         const {datesOptions} = this
         return(
             <div class="custom-date-picker">
-                <div class="custom-header-text">Fecha de reservacion</div>
+                <div class="custom-header-text">Fecha de reservación</div>
                 <select class="select-css" value={selectedDate} onChange={onDateSelected}>
                 {
                     datesOptions.map(el => {

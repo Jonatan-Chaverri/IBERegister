@@ -9,6 +9,8 @@ import FooterBar from '../components/Footer'
 
 import logo from '../images/logo.png'
 
+import {HEADERNAME, HEADERSUBTITLE} from '../constants'
+
 
 class Home extends Component {
     constructor(props){
@@ -44,8 +46,8 @@ class Home extends Component {
                             <img src={logo} alt="logo" width="100%" height="100%"/>
                         </div>
                         <div className='header-text'>
-                            <p className='header-name'>Iglesia Bautista Emmanuel</p>
-                            <p className='header-location'>San Jose, CR</p>
+                            <p className='header-name'>{HEADERNAME}</p>
+                            <p className='header-location'>{HEADERSUBTITLE}</p>
                         </div>
                     </div>
                 </div>

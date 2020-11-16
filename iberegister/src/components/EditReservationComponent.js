@@ -4,6 +4,24 @@ import {MAX_ALLOWED_GUESTS} from "../config"
 import CustomDatePicker from './CustomDatePicker'
 import GuestsInputForm from './GuestsInputForm'
 
+import {
+    NO_ROOM_ERROR,
+    INVALID_NAME_ERROR,
+    INVALID_PHONE_ERROR,
+    FAILED_STATE,
+    COMPLETED_STATE,
+    PENDING_STATE,
+    FOUND_STATE,
+    DELETED_STATE,
+    INVALID_RESERVATION_CODE,
+    RESERVATION_NOT_FOUND_ERROR,
+    UPDATE_BUTTON,
+    DELETE_RESERVATION_BUTTON,
+    UPDATE_SUCCESS,
+    DELETE_SUCCESS,
+    SEARCH_BUTTON
+} from "../constants"
+
 // Check more icons at here https://react-icons.github.io/react-icons/icons?name=fa
 import { FaCheckCircle, FaTimesCircle } from 'react-icons/fa'
 
@@ -29,7 +47,7 @@ class EditReservationForm extends Component {
                 "phone": ""
             },
             reservationId: "",
-            updateState: "pending",
+            updateState: PENDING_STATE,
             reservationDate: `${y}-${m}-${d}`,
             errorMessages: {
                 personalDataName: false,
@@ -70,71 +88,43 @@ class EditReservationForm extends Component {
     }
 
     handleClickSearch(event){
-        const {reservationId, reservationDate} = this.state
+        const {reservationId, reservationDate, errorMessages} = this.state
         if (reservationId.length < 9){
+            // Reservation code should have 9 digits exactly
+            errorMessages.reservationNotValid = true
+            errorMessages.reservationNotFound = false
             this.setState({
-                guests: ["","",""],
-                personalData: {
-                    name: "",
-                    phone: ""
-                },
-                updateState: "pending",
-                errorMessages: {
-                    personalDataName: false,
-                    personalDataPhone: false,
-                    guests: [false, false, false],
-                    notAvailableSpace: false,
-                    reservationNotFound: false,
-                    reservationNotValid: true
-                }
+                errorMessages: errorMessages
             })
             return
         }
+        errorMessages.reservationNotValid = false
         const dbUrl = `/${reservationDate}/${reservationId}`
         let ref = Firebase.database().ref(dbUrl)
 
         ref.on('value', snapshot => {
             var reservation = snapshot.val();
+            ref.off('value')
             if (reservation == null){
+                errorMessages.reservationNotFound = true
                 this.setState({
-                    guests: ["","",""],
-                    personalData: {
-                        name: "",
-                        phone: ""
-                    },
-                    updateState: "pending",
-                    errorMessages: {
-                        personalDataName: false,
-                        personalDataPhone: false,
-                        guests: [false, false, false],
-                        notAvailableSpace: false,
-                        reservationNotFound: true,
-                        reservationNotValid: false
-                    }
+                    errorMessages: errorMessages
                 })
                 return
             }
+            errorMessages.reservationNotFound = false
             const guestsFound = reservation.guests.replace(reservation.name, "").split(",")
+            errorMessages.guests = Array(guestsFound.length).fill(false)
             this.setState({
                 guests: guestsFound,
                 personalData: {
                     name: reservation.name,
                     phone: reservation.phone
                 },
-                updateState: "found",
-                errorMessages: {
-                    personalDataName: false,
-                    personalDataPhone: false,
-                    guests: Array(guestsFound.length).fill(false),
-                    notAvailableSpace: false,
-                    reservationNotFound: false,
-                    reservationNotValid: false
-                }
+                updateState: FOUND_STATE,
+                errorMessages: errorMessages
             })
-
         })
-
-
     }
 
     isValidName(name){
@@ -191,13 +181,13 @@ class EditReservationForm extends Component {
     getReservationErrors(){
         const {errorMessages, personalData} = this.state
         if (errorMessages.notAvailableSpace){
-            return "No hay espacio disponible para todos los invitados"
+            return NO_ROOM_ERROR
         }
         if (errorMessages.personalDataName || !personalData.name){
-            return "El nombre que introdujo en datos personales no es valido"
+            return INVALID_NAME_ERROR
         }
         if (errorMessages.personalDataPhone || !personalData.phone){
-            return "El telefono que introdujo en datos personales no es valido"
+            return INVALID_PHONE_ERROR
         }
         const guestsValues = Object.values(errorMessages.guests)
         const guestError = guestsValues.indexOf(true)
@@ -213,7 +203,7 @@ class EditReservationForm extends Component {
 
         if (getReservationErrors()){
             this.setState({
-                updateState: "failed"
+                updateState: FAILED_STATE
             })
             return
         }
@@ -235,13 +225,12 @@ class EditReservationForm extends Component {
                 currentGuests = currentGuests + guestsFound.length
             }
             const availableSpace = MAX_ALLOWED_GUESTS - currentGuests
-            console.log("available spaces are "+availableSpace)
             var filtered = guests.filter(el => {return el.length > 0})
             filtered.push(personalData.name)
             if (filtered.length > availableSpace){
                 errorMessages.notAvailableSpace = true
                 this.setState({
-                    updateState: "failed",
+                    updateState: FAILED_STATE,
                     errorMessages: errorMessages
                 })
                 return
@@ -254,7 +243,7 @@ class EditReservationForm extends Component {
             const dbUrl = `/${reservationDate}/${reservationId}`
             Firebase.database().ref(dbUrl).set(documentToSave)
             this.setState({
-                updateState: "completed"
+                updateState: COMPLETED_STATE
             })
         })
     }
@@ -264,7 +253,7 @@ class EditReservationForm extends Component {
         const dbUrl = `/${reservationDate}/${reservationId}`
         Firebase.database().ref(dbUrl).remove()
         this.setState({
-            updateState: "deleted"
+            updateState: DELETED_STATE
         })
     }
 
@@ -296,19 +285,25 @@ class EditReservationForm extends Component {
                         <CustomDatePicker selectedDate={reservationDate} onDateSelected={handleDateChange}/>
                     </div>
                     <div class="horizontal-block horizontal-space-block">
-                        <div class="custom-header-text">Codigo de reservacion</div>
+                        <div class="custom-header-text">Código de reservación</div>
                         <input type="text" value={reservationId} onChange={handleReservationChange}/>
                     </div>
                 </div>
                 <div class="main-block">
-                    <input class="button-add-reserve" type="button" value="Buscar" onClick={handleClickSearch} disabled={["completed", "deleted"].includes(updateState)}/>
+                    <input 
+                        class="button-add-reserve"
+                        type="button"
+                        value={SEARCH_BUTTON}
+                        onClick={handleClickSearch}
+                        disabled={[FOUND_STATE,COMPLETED_STATE, DELETED_STATE].includes(updateState)}
+                    />
                 </div>
                 <div class="error-message">
                 {
                     errorMessages.reservationNotFound ?
-                        <div>La reservacion no existe <FaTimesCircle class="icon-fail-circle"/></div>
+                        <div>{RESERVATION_NOT_FOUND_ERROR} <FaTimesCircle class="icon-fail-circle"/></div>
                          : errorMessages.reservationNotValid ?
-                            <div>El codigo de reservacion no es valido <FaTimesCircle class="icon-fail-circle"/></div> :
+                            <div>{INVALID_RESERVATION_CODE} <FaTimesCircle class="icon-fail-circle"/></div> :
                             <div>&nbsp;</div>
                 }
                 </div>
@@ -316,7 +311,7 @@ class EditReservationForm extends Component {
                     personalData={personalData}
                     guests={guests}
                     errorMessages={errorMessages}
-                    disabled={["pending", "completed", "deleted"].includes(updateState)}
+                    disabled={[PENDING_STATE, COMPLETED_STATE, DELETED_STATE].includes(updateState)}
                     handlePersonalDataChange={handlePersonalDataChange}
                     handleGuestInputChange={handleInputChange}
                     onClickAddGuest={addGuestInput}
@@ -326,25 +321,25 @@ class EditReservationForm extends Component {
                         <input 
                             class="button-add-reserve"
                             type="button"
-                            value="Actualizar"
-                            disabled={["pending", "completed", "deleted"].includes(updateState)}
+                            value={UPDATE_BUTTON}
+                            disabled={[PENDING_STATE, COMPLETED_STATE, DELETED_STATE].includes(updateState)}
                             onClick={handleClickUpdate}/>
                     </div>
                     <div class="main-block horizontal-block">
                         <input
                         class="button-warning"
                         type="button"
-                        value="Eliminar reserva"
-                        disabled={["pending", "completed", "deleted"].includes(updateState)}
+                        value={DELETE_RESERVATION_BUTTON}
+                        disabled={[PENDING_STATE, COMPLETED_STATE, DELETED_STATE].includes(updateState)}
                         onClick={handleClickDelete}
                     />
                     </div>
                 </div>
                 <div>
                     {
-                        updateState == "failed" ? <div class="error-message">{getReservationErrors()}</div> :
-                        updateState == "completed"? <div class="text-success">Se ha actualizado su reserva <FaCheckCircle class="icon-check-circle"/></div> :
-                        updateState == "deleted" ?  <div class="text-error">Se ha eliminado su reserva <FaCheckCircle class="icon-check-circle"/></div> :
+                        updateState == FAILED_STATE ? <div class="error-message">{getReservationErrors()}</div> :
+                        updateState == COMPLETED_STATE? <div class="text-success">{UPDATE_SUCCESS} <FaCheckCircle class="icon-check-circle"/></div> :
+                        updateState == DELETED_STATE ?  <div class="text-error">{DELETE_SUCCESS} <FaCheckCircle class="icon-check-circle"/></div> :
                         <div> &nbsp;</div>
                     }
                 </div>

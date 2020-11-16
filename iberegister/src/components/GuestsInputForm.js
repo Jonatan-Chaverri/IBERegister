@@ -35,7 +35,7 @@ class GuestsInputForm extends Component {
                                 }/></th>
                         </tr>
                         <tr>
-                            <th>Telefono</th>
+                            <th>Teléfono</th>
                             <th className={errorMessages.personalDataPhone ? "input-error" : ""}><input 
                                 type="text"
                                 value={personalData.phone}
@@ -50,7 +50,7 @@ class GuestsInputForm extends Component {
                     </table>
                 </div>
                 <div class="guests-block">
-                    <div class="custom-header-text">Nombres de acompanantes</div>
+                    <div class="custom-header-text">Nombres de acompañantes</div>
                     <div>
                     {
                         guests.map((guest, index) => {

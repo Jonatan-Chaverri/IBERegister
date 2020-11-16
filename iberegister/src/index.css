@@ -20,6 +20,29 @@ body {
   font-size: 20px;
 }
 
+@media(max-width: 450px){
+  .topnav label {
+    float: left;
+    color: white;
+    text-align: center;
+    padding: 14px 16px;
+    text-decoration: none;
+    font-size: 17px;
+  }
+}
+
+@media(max-width: 390px){
+  .topnav label {
+    float: left;
+    color: white;
+    text-align: center;
+    padding: 14px 16px;
+    text-decoration: none;
+    font-size: 14px;
+    font-weight: bold;
+  }
+}
+
 /* Change the color of links on hover */
 .topnav label:hover {
   background-color: #FFFFFF;
@@ -40,6 +63,7 @@ body {
     box-shadow: 0px 2px 2px black;
     margin: 0px;
 }
+
 
 .registerForm{
   padding-top: 20px;
@@ -67,6 +91,13 @@ body {
     align-self: stretch;
 }
 
+@media(max-width: 650px){
+    .header-data {
+        width: 90%;
+        height: 95%;
+    }
+}
+
 .header-text {
     color: black;
     height: 90%;
@@ -78,6 +109,22 @@ body {
     font-size: 30px;
     height: 10px;
     font-weight: bold;
+}
+
+@media(max-width: 635px){
+    .header-name {
+        font-size: 30px;
+        height: 40px;
+        font-weight: bold;
+    }
+}
+
+@media(max-width: 480px){
+    .header-name {
+        font-size: 30px;
+        height: 80px;
+        font-weight: bold;
+    }
 }
 
 .header-location {
@@ -325,6 +372,34 @@ body {
     min-height: 110px;
 }
 
+@media(max-width: 550px){
+    .reservation-result-block{
+        padding: 5px 5px 10px 10px;
+        color: black;
+        font-size: 17px;
+        font-weight: bold;
+        border-radius: 5px;
+        background: rgb(244,242,242);
+        background: radial-gradient(circle, rgba(244,242,242,1) 0%, rgba(224,217,218,1) 71%);
+        max-width: 400px;
+        min-height: 110px;
+    }
+}
+
+@media(max-width: 440px){
+    .reservation-result-block{
+        padding: 5px 5px 10px 10px;
+        color: black;
+        font-size: 17px;
+        font-weight: bold;
+        border-radius: 5px;
+        background: rgb(244,242,242);
+        background: radial-gradient(circle, rgba(244,242,242,1) 0%, rgba(224,217,218,1) 71%);
+        max-width: 340px;
+        min-height: 110px;
+    }
+}
+
 .icon-check-circle{
     color: #20A50B;
 }
@@ -354,6 +429,28 @@ body {
   border-radius: 5px;
   background: rgb(244,242,242);
   background: radial-gradient(circle, rgba(244,242,242,1) 0%, rgba(224,217,218,1) 71%);
+}
+
+@media(max-width: 550px){
+    .reservation-result-hidden{
+        padding: 5px 5px 10px 10px;
+        min-height: 110px;
+        max-width: 400px;
+        border-radius: 5px;
+        background: rgb(244,242,242);
+        background: radial-gradient(circle, rgba(244,242,242,1) 0%, rgba(224,217,218,1) 71%);
+    }
+}
+
+@media(max-width: 440px){
+    .reservation-result-hidden{
+        padding: 5px 5px 10px 10px;
+        min-height: 110px;
+        max-width: 340px;
+        border-radius: 5px;
+        background: rgb(244,242,242);
+        background: radial-gradient(circle, rgba(244,242,242,1) 0%, rgba(224,217,218,1) 71%);
+    }
 }
 
 .main-block{

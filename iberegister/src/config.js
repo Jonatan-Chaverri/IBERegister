@@ -9,5 +9,6 @@ export const firebase_config = {
     measurementId: "SECRET"
 }
 export const MAX_ALLOWED_GUESTS = 125
+export const MAX_GUESTS_PER_RESERVATION = 10
 
 export default firebase_config
