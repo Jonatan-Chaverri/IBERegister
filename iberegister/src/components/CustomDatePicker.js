@@ -19,12 +19,12 @@ class CustomDatePicker extends Component {
     }
 
     render(){
-        const {selectedDate, onDateSelected} = this.props
+        const {selectedDate, onDateSelected, disabled} = this.props
         const {datesOptions} = this
         return(
             <div class="custom-date-picker">
                 <div class="custom-header-text">Fecha de reservación</div>
-                <select class="select-css" value={selectedDate} onChange={onDateSelected}>
+                <select class="select-css" value={selectedDate} onChange={onDateSelected} disabled={disabled}>
                 {
                     datesOptions.map(el => {
                         return (<option value={el}>{el}</option>)
