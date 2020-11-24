@@ -10,18 +10,13 @@ import {FaTimesCircle } from 'react-icons/fa'
 import logo from '../images/logo.png'
 
 import {ADMIN_USER, ADMIN_PASSWORD} from '../config'
+import {nextAvailableDate} from '../utils'
 
 
 class Admin extends Component {
 
     constructor(props){
         super(props)
-        // The initial reservation date is always next sunday
-        const currentDate = new Date()
-        currentDate.setDate(currentDate.getDate() + (14-currentDate.getDay()) % 7)
-        const y = new Intl.DateTimeFormat('en', { year: 'numeric' }).format(currentDate);
-        const m = new Intl.DateTimeFormat('en', { month: 'numeric' }).format(currentDate);
-        const d = new Intl.DateTimeFormat('en', { day: '2-digit' }).format(currentDate);
 
         Firebase.initializeApp(firebase_config)
 
@@ -29,7 +24,7 @@ class Admin extends Component {
             isLoggedIn: false,
             user: "",
             password: "",
-            reservationDate: `${y}-${m}-${d}`,
+            reservationDate: nextAvailableDate(new Date()),
             reservations: {},
             errorMessage: ""
         }

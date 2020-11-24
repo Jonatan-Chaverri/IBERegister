@@ -1,20 +1,15 @@
 import React, { Component } from 'react'
 import Datepicker from 'react-datepicker'
+import {nextAvailableDate} from '../utils'
 
 class CustomDatePicker extends Component {
 
     constructor(props) {
         super(props)
         this.datesOptions = ["", "", "", ""]
-        const currentDate = new Date()
-        var y, m, d
+        var currentDate = new Date()
         for (let dateIndex in this.datesOptions){
-            currentDate.setDate(currentDate.getDate() + (14-currentDate.getDay()) % 7)
-            y = new Intl.DateTimeFormat('en', { year: 'numeric' }).format(currentDate);
-            m = new Intl.DateTimeFormat('en', { month: 'numeric' }).format(currentDate);
-            d = new Intl.DateTimeFormat('en', { day: '2-digit' }).format(currentDate);
-            this.datesOptions[dateIndex] = `${y}-${m}-${d}`
-            currentDate.setDate(currentDate.getDate() + 1)
+            this.datesOptions[dateIndex] = nextAvailableDate(currentDate)
         }
     }
 

@@ -29,7 +29,9 @@ class ReservationsDisplay extends Component {
                                     <td className="display-reservations-table-td"> {item} </td>
                                     <td className="display-reservations-table-td"> {reservations[item].name} </td>
                                     <td className="display-reservations-table-td"> {reservations[item].phone} </td>
-                                    <td className="display-reservations-table-td"> {reservations[item].guests} </td>
+                                    <td className="display-reservations-table-td">
+                                        {reservations[item].guests.replaceAll(",", "\n")}
+                                    </td>
                                 </tr>
                             )
                         })

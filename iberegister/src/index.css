@@ -271,7 +271,8 @@ body {
 
 .button-add-more:enabled{
   background-color: #38AF21;
-  font-size: 20px;
+  font-size: 15px;
+  font-family: "Raleway", sans-serif;
   font-weight: bold;
   color: white;
   padding: 0px 20px 0px 20px;
@@ -283,7 +284,8 @@ body {
 
 .button-add-more:disabled{
   background-color: #807C7C;
-  font-size: 20px;
+  font-size: 15px;
+  font-family: "Raleway", sans-serif;
   font-weight: bold;
   color: white;
   padding: 0px 20px 0px 20px;
@@ -295,7 +297,8 @@ body {
 
 .button-add-more:hover:enabled{
   background-color: #FFF;
-  font-size: 20px;
+  font-size: 15px;
+  font-family: "Raleway", sans-serif;
   color: #13ace5;
   padding: 0px 20px 0px 20px;
   border: 1px solid rgba(0,0,0,0.21);
@@ -543,4 +546,5 @@ body {
 .display-reservations-table-td{
   padding-right: 150px;
   padding-bottom: 10px;
+  white-space: pre;
 }

@@ -3,6 +3,7 @@ import Firebase from 'firebase'
 import {MAX_ALLOWED_GUESTS} from "../config"
 import CustomDatePicker from './CustomDatePicker'
 import GuestsInputForm from './GuestsInputForm'
+import {nextAvailableDate} from '../utils'
 
 import {
     NO_ROOM_ERROR,
@@ -32,13 +33,6 @@ class EditReservationForm extends Component {
 
     constructor(props) {
         super(props)
-        
-        // The initial reservation date is always next sunday
-        const currentDate = new Date()
-        currentDate.setDate(currentDate.getDate() + (14-currentDate.getDay()) % 7)
-        const y = new Intl.DateTimeFormat('en', { year: 'numeric' }).format(currentDate);
-        const m = new Intl.DateTimeFormat('en', { month: 'numeric' }).format(currentDate);
-        const d = new Intl.DateTimeFormat('en', { day: '2-digit' }).format(currentDate);
 
         this.state = {
             guests: ["","",""],
@@ -48,7 +42,7 @@ class EditReservationForm extends Component {
             },
             reservationId: "",
             updateState: PENDING_STATE,
-            reservationDate: `${y}-${m}-${d}`,
+            reservationDate: nextAvailableDate(new Date()),
             errorMessages: {
                 personalDataName: false,
                 personalDataPhone: false,
@@ -128,12 +122,12 @@ class EditReservationForm extends Component {
     }
 
     isValidName(name){
-        const regex = /^[A-Za-z]{1,15}\s[A-Za-z]{1,15}(\s[A-Za-z]{1,15}$|$)/
+        const regex = /^[A-Za-zñÑ]{1,15}\s[A-Za-zñÑ]{1,15}(\s[A-Za-zñÑ]{1,15}$|$)/
         return regex.test(name)
     }
 
     isValidPhone(phone){
-        const regex = /^[0-8]{8}$/
+        const regex = /^[0-9]{8}$/
         return regex.test(phone)
     }
 

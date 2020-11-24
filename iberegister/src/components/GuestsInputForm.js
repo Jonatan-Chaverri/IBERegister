@@ -86,7 +86,7 @@ class GuestsInputForm extends Component {
                     }
                         <input 
                             type="button"
-                            value="+"
+                            value="+ Añadir"
                             class="button-add-more"
                             disabled={guests.length >= 10 || disabled}
                             onClick={onClickAddGuest}></input><br/><br/>
