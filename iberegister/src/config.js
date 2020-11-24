@@ -11,7 +11,7 @@ export const firebase_config = {
 export const MAX_ALLOWED_GUESTS = 150
 export const MAX_GUESTS_PER_RESERVATION = 9
 
-// List of dates that will be skipped from select box
+// Lists of dates that will be skipped from select box
 export const SKIP_DATES = []
 
 // Change this values for prod
