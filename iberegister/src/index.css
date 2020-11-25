@@ -245,6 +245,7 @@ body {
 .custom-subtitle{
   padding-top: 20px;
   color: red;
+  font-family: "Montserrat", sans-serif;
   font-size: 14px;
   text-decoration: underline;
 }
@@ -266,6 +267,7 @@ body {
 }
 
 .input-block{
+  width: 220px;
   padding-bottom: 5px;
 }
 
@@ -450,6 +452,7 @@ body {
 }
 
 .input-error-container{
+  width: 220px;
   background: rgba(196, 3, 3, 0.6);
 }
 
@@ -520,6 +523,7 @@ body {
 .text-input{
   border-radius: 6px;
   font-size: 15px;
+  width: 95%;
   padding-top: 3px;
   padding-bottom: 3px;
 }

@@ -3,7 +3,7 @@ import Firebase from 'firebase'
 import {MAX_ALLOWED_GUESTS, MAX_GUESTS_PER_RESERVATION} from "../config"
 import CustomDatePicker from './CustomDatePicker'
 import GuestsInputForm from './GuestsInputForm'
-import {nextAvailableDate} from '../utils'
+import {nextAvailableDate, isValidName, isValidPhone} from '../utils'
 
 import {
     NO_ROOM_ERROR,
@@ -59,20 +59,8 @@ class RegisterForm extends Component {
         this.handleInputChange = this.handleInputChange.bind(this)
         this.handleDateChange = this.handleDateChange.bind(this)
         this.handlePersonalDataChange = this.handlePersonalDataChange.bind(this)
-        this.isValidName = this.isValidName.bind(this)
-        this.isValidPhone = this.isValidPhone.bind(this)
         this.getReservationErrors = this.getReservationErrors.bind(this)
         this.checkAvailableSpace = this.checkAvailableSpace.bind(this)
-    }
-
-    isValidName(name){
-        const regex = /^[A-Za-zñÑ]{1,15}\s[A-Za-zñÑ]{1,15}(\s[A-Za-zñÑ]{1,15}$|$)/
-        return regex.test(name)
-    }
-
-    isValidPhone(phone){
-        const regex = /^[0-9]{8}$/
-        return regex.test(phone)
     }
 
     getReservationErrors(){
@@ -151,7 +139,6 @@ class RegisterForm extends Component {
 
     handleInputChange(index, value){
         const {guests, errorMessages} = this.state
-        const{isValidName} = this
         errorMessages.guests[index] = value ? !isValidName(value) : false
         guests[index] = value
         errorMessages.notAvailableSpace = false
@@ -168,7 +155,6 @@ class RegisterForm extends Component {
 
     handlePersonalDataChange(nameValue, phoneValue){
         const{errorMessages} = this.state
-        const{isValidName, isValidPhone} = this
         const formattedPhone = phoneValue.replace("-", "").replace(" ", "")
 
         errorMessages.personalDataName = nameValue ? !isValidName(nameValue) : false
@@ -232,7 +218,7 @@ class RegisterForm extends Component {
             <div class="registerForm">
                 <div class="date-selection-block">
                     <CustomDatePicker selectedDate={reservationDate} onDateSelected={handleDateChange}/>
-                    <div class="custom-subtitle">Quedan {availableSpace} campos</div>
+                    <div class="custom-subtitle">Quedan {availableSpace} espacios</div>
                 </div>
                 <GuestsInputForm
                     personalData={personalData}

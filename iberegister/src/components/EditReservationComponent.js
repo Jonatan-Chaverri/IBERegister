@@ -3,7 +3,7 @@ import Firebase from 'firebase'
 import {MAX_ALLOWED_GUESTS} from "../config"
 import CustomDatePicker from './CustomDatePicker'
 import GuestsInputForm from './GuestsInputForm'
-import {nextAvailableDate} from '../utils'
+import {nextAvailableDate, isValidName, isValidPhone} from '../utils'
 
 import {
     NO_ROOM_ERROR,
@@ -58,8 +58,6 @@ class EditReservationForm extends Component {
         this.handlePersonalDataChange = this.handlePersonalDataChange.bind(this)
         this.handleInputChange = this.handleInputChange.bind(this)
         this.addGuestInput = this.addGuestInput.bind(this)
-        this.isValidName = this.isValidName.bind(this)
-        this.isValidPhone = this.isValidPhone.bind(this)
         this.handleClickUpdate = this.handleClickUpdate.bind(this)
         this.getReservationErrors = this.getReservationErrors.bind(this)
         this.handleClickDelete = this.handleClickDelete.bind(this)
@@ -121,19 +119,8 @@ class EditReservationForm extends Component {
         })
     }
 
-    isValidName(name){
-        const regex = /^[A-Za-zñÑ]{1,15}\s[A-Za-zñÑ]{1,15}(\s[A-Za-zñÑ]{1,15}$|$)/
-        return regex.test(name)
-    }
-
-    isValidPhone(phone){
-        const regex = /^[0-9]{8}$/
-        return regex.test(phone)
-    }
-
     handlePersonalDataChange(nameValue, phoneValue){
         const{errorMessages} = this.state
-        const{isValidName, isValidPhone} = this
         const formattedPhone = phoneValue.replace("-", "").replace(" ", "")
 
         errorMessages.personalDataName = nameValue ? !isValidName(nameValue) : false
@@ -149,7 +136,6 @@ class EditReservationForm extends Component {
 
     handleInputChange(index, value){
         const {guests, errorMessages} = this.state
-        const{isValidName} = this
         errorMessages.guests[index] = value ? !isValidName(value) : false
         guests[index] = value
         errorMessages.notAvailableSpace = false

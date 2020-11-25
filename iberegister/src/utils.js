@@ -1,5 +1,14 @@
 import {SKIP_DATES} from "./config"
 
+export const isValidName = name => {
+    const regex = /^[A-Za-zñÑÁ-Źá-ź]{1,15}\s[A-Za-zñÑÁ-Źá-ź]{1,15}(\s[A-Za-zñÑÁ-Źá-ź]{1,15}$|$)/
+    return regex.test(name)
+}
+
+export const isValidPhone = phone => {
+    const regex = /^[0-9]{8}$/
+    return regex.test(phone)
+}
 
 export const nextAvailableDate = currentDate => {
     var dateOut = ""

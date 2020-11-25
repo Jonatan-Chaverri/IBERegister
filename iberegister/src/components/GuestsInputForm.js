@@ -23,7 +23,7 @@ class GuestsInputForm extends Component {
                     <table>
                         <tr>
                             <th>Nombre</th>
-                            <th className={errorMessages.personalDataName ? "input-error-container" : ""}>
+                            <th className={errorMessages.personalDataName ? "input-error-container" : "input-block"}>
                             <div className="input-error">
                                 <input 
                                     type="text"
@@ -42,7 +42,7 @@ class GuestsInputForm extends Component {
                         </tr>
                         <tr>
                             <th>Teléfono</th>
-                            <th className={errorMessages.personalDataPhone ? "input-error-container" : ""}>
+                            <th className={errorMessages.personalDataPhone ? "input-error-container" : "input-block"}>
                             <div className="input-error">
                                 <input 
                                     type="text"
