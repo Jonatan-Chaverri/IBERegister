@@ -1,25 +1,22 @@
 import React, { Component } from 'react'
-import Datepicker from 'react-datepicker'
-import {nextAvailableDate} from '../utils'
+import {nextAvailableDate, isAvailableReservation} from '../utils'
 
 class CustomDatePicker extends Component {
 
     constructor(props) {
         super(props)
-        this.datesOptions = ["", "", "", ""]
-        var currentDate = new Date()
-        for (let dateIndex in this.datesOptions){
-            this.datesOptions[dateIndex] = nextAvailableDate(currentDate)
-        }
+        this.datesOptions = [""]
+        const nextSundayDate = nextAvailableDate()
+        this.datesOptions[0] = isAvailableReservation(nextSundayDate) ? nextSundayDate : "No disponible"
     }
 
     render(){
         const {selectedDate, onDateSelected, disabled} = this.props
         const {datesOptions} = this
         return(
-            <div class="custom-date-picker">
-                <div class="custom-header-text">Fecha de reservación</div>
-                <select class="select-css" value={selectedDate} onChange={onDateSelected} disabled={disabled}>
+            <div className="custom-date-picker">
+                <div className="custom-header-text">Fecha de reservación</div>
+                <select className="select-css" value={selectedDate} onChange={onDateSelected} disabled={disabled}>
                 {
                     datesOptions.map(el => {
                         return (<option value={el}>{el}</option>)

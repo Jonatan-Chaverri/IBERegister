@@ -2,10 +2,6 @@ import React, { Component } from 'react'
 
 class GuestsInputForm extends Component {
 
-    constructor(props) {
-        super(props)
-    }
-
     render(){
         const {
             personalData,
@@ -17,12 +13,12 @@ class GuestsInputForm extends Component {
             onClickAddGuest
         } = this.props
         return(
-            <div class="guest-reservation-block">
-                <div class="personal-data-block">
-                    <div class="custom-header-text">Datos personales</div>
+            <div className="guest-reservation-block">
+                <div className="personal-data-block">
+                    <div className="custom-header-text">Datos personales</div>
                     <table>
                         <tr>
-                            <th>Nombre</th>
+                            <th className="table-left">Nombre completo</th>
                             <th className={errorMessages.personalDataName ? "input-error-container" : "input-block"}>
                             <div className="input-error">
                                 <input 
@@ -41,7 +37,7 @@ class GuestsInputForm extends Component {
                             </th>
                         </tr>
                         <tr>
-                            <th>Teléfono</th>
+                            <th className="table-left">Teléfono</th>
                             <th className={errorMessages.personalDataPhone ? "input-error-container" : "input-block"}>
                             <div className="input-error">
                                 <input 
@@ -61,13 +57,13 @@ class GuestsInputForm extends Component {
                         </tr>
                     </table>
                 </div>
-                <div class="guests-block">
-                    <div class="custom-header-text">Nombres de acompañantes</div>
+                <div className="guests-block">
+                    <div className="custom-header-text">Nombres de acompañantes</div>
                     <div>
                     {
                         guests.map((guest, index) => {
                                 return (
-                                    <div class={errorMessages.guests[index] ? "input-error-container" : "input-block"}>
+                                    <div className={errorMessages.guests[index] ? "input-error-container" : "input-block"}>
                                     <div className="input-error">
                                         <input 
                                             type="text"
@@ -87,7 +83,7 @@ class GuestsInputForm extends Component {
                         <input 
                             type="button"
                             value="+ Añadir"
-                            class="button-add-more"
+                            className="button-add-more"
                             disabled={guests.length >= 10 || disabled}
                             onClick={onClickAddGuest}></input><br/><br/>
                     </div>

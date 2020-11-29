@@ -4,10 +4,7 @@ import firebase_config from "../config"
 
 import CustomDatePicker from '../components/CustomDatePicker'
 import ReservationsDisplay from '../components/ReservationsDisplay'
-import FooterBar from '../components/Footer'
 import {FaTimesCircle } from 'react-icons/fa'
-
-import logo from '../images/logo.png'
 
 import {ADMIN_USER, ADMIN_PASSWORD} from '../config'
 import {nextAvailableDate} from '../utils'
@@ -65,7 +62,7 @@ class Admin extends Component {
     handleClickValidate(event){
         const {user, password, reservationDate} = this.state
         const {handleDateChange}= this
-        if (user == ADMIN_USER && password == ADMIN_PASSWORD){
+        if (user === ADMIN_USER && password === ADMIN_PASSWORD){
             handleDateChange(reservationDate)
             this.setState({
                 errorMessage: "",

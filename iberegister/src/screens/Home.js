@@ -39,7 +39,7 @@ class Home extends Component {
         const {pageType} = this.state
         const {handleEdit, handleReservation} = this
         return (
-            <div class="main">
+            <div className="main">
                 <div className='header-layout'>
                     <div className='header-data'>
                         <div className='header-photo'>
@@ -52,12 +52,12 @@ class Home extends Component {
                     </div>
                 </div>
                 <HeaderBar
-                    highlightReservation={pageType == "reservation"}
+                    highlightReservation={pageType === "reservation"}
                     handleEdit={handleEdit}
                     handleReservation={handleReservation}
                 />
                 {
-                    pageType == "reservation" ? <RegisterForm/> :<EditReservationForm/>
+                    pageType === "reservation" ? <RegisterForm/> :<EditReservationForm/>
                 }
                 <FooterBar></FooterBar>
             </div>

@@ -5,9 +5,9 @@ import {FOOTER_PHONE} from "../constants"
 class FooterBar extends Component {
     render() {
         return (
-            <div class="bottomnav">
-              <div class="footer-text">Información de contacto</div>
-              <div class="footer-text">Tel: {FOOTER_PHONE}</div>
+            <div className="bottomnav">
+              <div className="footer-text">Información de contacto</div>
+              <div className="footer-text">Tel: {FOOTER_PHONE}</div>
             </div>
         )
     }

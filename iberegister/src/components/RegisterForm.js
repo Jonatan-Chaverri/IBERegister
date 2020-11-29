@@ -3,7 +3,7 @@ import Firebase from 'firebase'
 import {MAX_ALLOWED_GUESTS, MAX_GUESTS_PER_RESERVATION} from "../config"
 import CustomDatePicker from './CustomDatePicker'
 import GuestsInputForm from './GuestsInputForm'
-import {nextAvailableDate, isValidName, isValidPhone} from '../utils'
+import {nextAvailableDate, isValidName, isValidPhone, isAvailableReservation} from '../utils'
 
 import {
     NO_ROOM_ERROR,
@@ -12,18 +12,12 @@ import {
     FAILED_STATE,
     COMPLETED_STATE,
     PENDING_STATE,
-    FOUND_STATE,
-    DELETED_STATE,
-    INVALID_RESERVATION_CODE,
-    RESERVATION_NOT_FOUND_ERROR,
-    UPDATE_BUTTON,
-    DELETE_RESERVATION_BUTTON,
-    UPDATE_SUCCESS,
-    DELETE_SUCCESS,
+    UNAVAILABLE_STATE,
     RESERVATION_BUTTON,
     RESERVATION_SUCCESS,
     RESERVATION_FAILED,
-    RESERVATION_WARNING
+    RESERVATION_WARNING,
+    UNAVAILABLE_DATE_MSG
 } from "../constants"
 
 // Check more icons at here https://react-icons.github.io/react-icons/icons?name=fa
@@ -37,8 +31,10 @@ class RegisterForm extends Component {
     constructor(props) {
         super(props)
 
+        const nextSundayDate = nextAvailableDate()
+
         this.state = {
-            reservationDate: nextAvailableDate(new Date()),
+            reservationDate: nextSundayDate,
             availableSpace: 0,
             guests: ["","",""],
             personalData: {
@@ -46,7 +42,7 @@ class RegisterForm extends Component {
                 "phone": ""
             },
             reservationId: Math.random().toString(36).substr(2, 9),
-            reservationState: PENDING_STATE,
+            reservationState: isAvailableReservation(nextSundayDate) ? PENDING_STATE: UNAVAILABLE_STATE,
             errorMessages: {
                 personalDataName: false,
                 personalDataPhone: false,
@@ -76,7 +72,7 @@ class RegisterForm extends Component {
         }
         const guestsValues = Object.values(errorMessages.guests)
         const guestError = guestsValues.indexOf(true)
-        if (guestError != -1){
+        if (guestError !== -1){
             return `El nombre del invitado ${guestError + 1} no es válido`
         }
         return false
@@ -92,7 +88,7 @@ class RegisterForm extends Component {
             errorMessages
         } = this.state
 
-        const {getDatabaseUrl, getReservationErrors} = this
+        const {getReservationErrors} = this
         const reservationErrors = getReservationErrors()
         if (reservationErrors){
             this.setState({
@@ -118,7 +114,7 @@ class RegisterForm extends Component {
             phone: personalData.phone
         }
         const dbUrl = `/${reservationDate}/${reservationId}`
-        let ref = Firebase.database().ref(dbUrl).set(documentToSave)
+        Firebase.database().ref(dbUrl).set(documentToSave)
         this.setState({
             reservationState: COMPLETED_STATE
         })
@@ -169,6 +165,10 @@ class RegisterForm extends Component {
     }
 
     checkAvailableSpace(selectedDate){
+        const {reservationState} = this.state
+        if (reservationState === UNAVAILABLE_STATE){
+            return
+        }
         const dbUrl = `/${selectedDate}`
         let ref = Firebase.database().ref(dbUrl)
 
@@ -211,20 +211,27 @@ class RegisterForm extends Component {
             handleInputChange,
             handleDateChange,
             handlePersonalDataChange,
-            getReservationErrors,
-            checkAvailableSpace
+            getReservationErrors
         } = this
         return (
-            <div class="registerForm">
-                <div class="date-selection-block">
-                    <CustomDatePicker selectedDate={reservationDate} onDateSelected={handleDateChange}/>
-                    <div class="custom-subtitle">Quedan {availableSpace} espacios</div>
+            <div className="registerForm">
+                <div className="date-selection-block">
+                    <CustomDatePicker
+                        selectedDate={reservationDate}
+                        onDateSelected={handleDateChange}
+                        disabled={reservationState === UNAVAILABLE_STATE}
+                    />
+                    {
+                        reservationState === UNAVAILABLE_STATE ? 
+                        <div className="custom-subtitle">{UNAVAILABLE_DATE_MSG}</div> :
+                        <div className="custom-subtitle">Quedan {availableSpace} espacios</div>
+                    }
                 </div>
                 <GuestsInputForm
                     personalData={personalData}
                     guests={guests}
                     errorMessages={errorMessages}
-                    disabled={reservationState == COMPLETED_STATE || availableSpace <= 0}
+                    disabled={reservationState === COMPLETED_STATE || availableSpace <= 0}
                     handlePersonalDataChange={handlePersonalDataChange}
                     handleGuestInputChange={handleInputChange}
                     onClickAddGuest={addGuestInput}
@@ -232,36 +239,36 @@ class RegisterForm extends Component {
                 <div>
                     <input 
                         type="button" 
-                        class="button-add-reserve"
+                        className="button-add-reserve"
                         value={RESERVATION_BUTTON}
-                        disabled={reservationState == COMPLETED_STATE || availableSpace <= 0}
+                        disabled={reservationState === COMPLETED_STATE || availableSpace <= 0}
                         onClick={createReservation}></input>
                 </div>
-                <div class="reservation-result-block-container">
+                <div className="reservation-result-block-container">
                 {
-                    reservationState != PENDING_STATE ?
-                            <div class="reservation-result-block">
-                                <div class="reservation-status-block">
-                                    {reservationState == COMPLETED_STATE? 
-                                      <p>{RESERVATION_SUCCESS}  <FaCheckCircle class="icon-check-circle"/></p>:
-                                      <p>{RESERVATION_FAILED} <FaTimesCircle class="icon-fail-circle"/></p> }
+                    ![PENDING_STATE, UNAVAILABLE_STATE].includes(reservationState) ?
+                            <div className="reservation-result-block">
+                                <div className="reservation-status-block">
+                                    {reservationState === COMPLETED_STATE? 
+                                      <p>{RESERVATION_SUCCESS}  <FaCheckCircle className="icon-check-circle"/></p>:
+                                      <p>{RESERVATION_FAILED} <FaTimesCircle className="icon-fail-circle"/></p> }
                                 </div>
                                 {
-                                    reservationState == COMPLETED_STATE ?
-                                        <div class="reservation-number-block">
-                                            <div class="reservation-number-block-warning">
+                                    reservationState === COMPLETED_STATE ?
+                                        <div className="reservation-number-block">
+                                            <div className="reservation-number-block-warning">
                                                 {RESERVATION_WARNING}
                                             </div>
                                             <div>
                                                 Código de reservación: {reservationId}
                                             </div>
                                         </div> :
-                                        <div class="reservation-number-block-error">
+                                        <div className="reservation-number-block-error">
                                             {getReservationErrors()}
                                         </div>
                                 }
                             </div>
-                    : <div class="reservation-result-hidden">&nbsp;</div>
+                    : <div className="reservation-result-hidden">&nbsp;</div>
                 }
                 </div>
             </div>

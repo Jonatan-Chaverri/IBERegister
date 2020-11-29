@@ -3,7 +3,7 @@ import Firebase from 'firebase'
 import {MAX_ALLOWED_GUESTS} from "../config"
 import CustomDatePicker from './CustomDatePicker'
 import GuestsInputForm from './GuestsInputForm'
-import {nextAvailableDate, isValidName, isValidPhone} from '../utils'
+import {nextAvailableDate, isValidName, isValidPhone, isAvailableReservation} from '../utils'
 
 import {
     NO_ROOM_ERROR,
@@ -14,13 +14,15 @@ import {
     PENDING_STATE,
     FOUND_STATE,
     DELETED_STATE,
+    UNAVAILABLE_STATE,
     INVALID_RESERVATION_CODE,
     RESERVATION_NOT_FOUND_ERROR,
     UPDATE_BUTTON,
     DELETE_RESERVATION_BUTTON,
     UPDATE_SUCCESS,
     DELETE_SUCCESS,
-    SEARCH_BUTTON
+    SEARCH_BUTTON,
+    UNAVAILABLE_DATE_MSG
 } from "../constants"
 
 // Check more icons at here https://react-icons.github.io/react-icons/icons?name=fa
@@ -34,6 +36,8 @@ class EditReservationForm extends Component {
     constructor(props) {
         super(props)
 
+        const nextSundayDate = nextAvailableDate()
+
         this.state = {
             guests: ["","",""],
             personalData: {
@@ -41,8 +45,8 @@ class EditReservationForm extends Component {
                 "phone": ""
             },
             reservationId: "",
-            updateState: PENDING_STATE,
-            reservationDate: nextAvailableDate(new Date()),
+            updateState: isAvailableReservation(nextSundayDate) ? PENDING_STATE : UNAVAILABLE_STATE,
+            reservationDate: nextSundayDate,
             errorMessages: {
                 personalDataName: false,
                 personalDataPhone: false,
@@ -171,14 +175,14 @@ class EditReservationForm extends Component {
         }
         const guestsValues = Object.values(errorMessages.guests)
         const guestError = guestsValues.indexOf(true)
-        if (guestError != -1){
+        if (guestError !== -1){
             return `El nombre del invitado ${guestError + 1} no es valido`
         }
         return false
     }
 
     handleClickUpdate(){
-        const {guests, personalData, reservationDate, reservationId, updateState, errorMessages} = this.state
+        const {guests, personalData, reservationDate, reservationId, errorMessages} = this.state
         const {getReservationErrors} = this
 
         if (getReservationErrors()){
@@ -198,7 +202,7 @@ class EditReservationForm extends Component {
             }
             var currentGuests = 0
             for (var reservation in reservations){
-                if (reservation == reservationId){
+                if (reservation === reservationId){
                     continue
                 }
                 const guestsFound = reservations[reservation].guests.split(",")
@@ -259,31 +263,37 @@ class EditReservationForm extends Component {
             handleClickDelete
         } = this
         return(
-            <div class="registerForm">
-                <div class="guests-block">
-                    <div class="horizontal-block horizontal-space-block">
-                        <CustomDatePicker selectedDate={reservationDate} onDateSelected={handleDateChange}/>
+            <div className="registerForm">
+                <div className="guests-block">
+                    <div className="horizontal-block horizontal-space-block">
+                        <CustomDatePicker
+                            selectedDate={reservationDate}
+                            onDateSelected={handleDateChange}
+                            disabled={updateState === UNAVAILABLE_STATE}
+                        />
                     </div>
-                    <div class="horizontal-block horizontal-space-block">
-                        <div class="custom-header-text">Código de reservación</div>
+                    <div className="horizontal-block horizontal-space-block">
+                        <div className="custom-header-text">Código de reservación</div>
                         <input className="text-input" type="text" value={reservationId} onChange={handleReservationChange}/>
                     </div>
                 </div>
-                <div class="main-block">
+                <div className="main-block">
                     <input 
-                        class="button-add-reserve"
+                        className="button-add-reserve"
                         type="button"
                         value={SEARCH_BUTTON}
                         onClick={handleClickSearch}
-                        disabled={[FOUND_STATE,COMPLETED_STATE, DELETED_STATE].includes(updateState)}
+                        disabled={
+                            [FOUND_STATE, COMPLETED_STATE, DELETED_STATE, UNAVAILABLE_STATE].includes(updateState)
+                        }
                     />
                 </div>
-                <div class="error-message">
+                <div className="error-message">
                 {
                     errorMessages.reservationNotFound ?
-                        <div>{RESERVATION_NOT_FOUND_ERROR} <FaTimesCircle class="icon-fail-circle"/></div>
+                        <div>{RESERVATION_NOT_FOUND_ERROR} <FaTimesCircle className="icon-fail-circle"/></div>
                          : errorMessages.reservationNotValid ?
-                            <div>{INVALID_RESERVATION_CODE} <FaTimesCircle class="icon-fail-circle"/></div> :
+                            <div>{INVALID_RESERVATION_CODE} <FaTimesCircle className="icon-fail-circle"/></div> :
                             <div>&nbsp;</div>
                 }
                 </div>
@@ -291,35 +301,36 @@ class EditReservationForm extends Component {
                     personalData={personalData}
                     guests={guests}
                     errorMessages={errorMessages}
-                    disabled={[PENDING_STATE, COMPLETED_STATE, DELETED_STATE].includes(updateState)}
+                    disabled={[PENDING_STATE, COMPLETED_STATE, DELETED_STATE, UNAVAILABLE_STATE].includes(updateState)}
                     handlePersonalDataChange={handlePersonalDataChange}
                     handleGuestInputChange={handleInputChange}
                     onClickAddGuest={addGuestInput}
                 />
-                <div class="main-block">
-                    <div class="main-block horizontal-block">
+                <div className="main-block">
+                    <div className="main-block horizontal-block">
                         <input 
-                            class="button-add-reserve"
+                            className="button-add-reserve"
                             type="button"
                             value={UPDATE_BUTTON}
-                            disabled={[PENDING_STATE, COMPLETED_STATE, DELETED_STATE].includes(updateState)}
+                            disabled={[PENDING_STATE, COMPLETED_STATE, DELETED_STATE, UNAVAILABLE_STATE].includes(updateState)}
                             onClick={handleClickUpdate}/>
                     </div>
-                    <div class="main-block horizontal-block">
+                    <div className="main-block horizontal-block">
                         <input
-                        class="button-warning"
+                        className="button-warning"
                         type="button"
                         value={DELETE_RESERVATION_BUTTON}
-                        disabled={[PENDING_STATE, COMPLETED_STATE, DELETED_STATE].includes(updateState)}
+                        disabled={[PENDING_STATE, COMPLETED_STATE, DELETED_STATE, UNAVAILABLE_STATE].includes(updateState)}
                         onClick={handleClickDelete}
                     />
                     </div>
                 </div>
                 <div>
                     {
-                        updateState == FAILED_STATE ? <div class="error-message">{getReservationErrors()}</div> :
-                        updateState == COMPLETED_STATE? <div class="text-success">{UPDATE_SUCCESS} <FaCheckCircle class="icon-check-circle"/></div> :
-                        updateState == DELETED_STATE ?  <div class="text-error">{DELETE_SUCCESS} <FaCheckCircle class="icon-check-circle"/></div> :
+                        updateState === FAILED_STATE ? <div className="error-message">{getReservationErrors()}</div> :
+                        updateState === COMPLETED_STATE? <div className="text-success">{UPDATE_SUCCESS} <FaCheckCircle className="icon-check-circle"/></div> :
+                        updateState === DELETED_STATE ?  <div className="text-error">{DELETE_SUCCESS} <FaCheckCircle className="icon-check-circle"/></div> :
+                        updateState === UNAVAILABLE_STATE ?  <div className="text-error">{UNAVAILABLE_DATE_MSG}</div> :
                         <div> &nbsp;</div>
                     }
                 </div>
