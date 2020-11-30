@@ -141,7 +141,7 @@ class Admin extends Component {
                                     disabled={!isLoggedIn}
                                 />
                             </div> 
-                            <ReservationsDisplay reservations={reservations}/>
+                            <ReservationsDisplay reservations={reservations} reservationDate={reservationDate}/>
                         </div>: <div class="date-selection-block"> &nbsp;</div>
                     }
                 </div>
