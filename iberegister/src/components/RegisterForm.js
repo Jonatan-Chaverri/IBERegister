@@ -1,5 +1,6 @@
 import React, { Component } from 'react'
-import Firebase from 'firebase'
+import Firebase from "firebase/app"
+import 'firebase/database'
 import {MAX_ALLOWED_GUESTS, MAX_GUESTS_PER_RESERVATION} from "../config"
 import CustomDatePicker from './CustomDatePicker'
 import GuestsInputForm from './GuestsInputForm'

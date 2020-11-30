@@ -19,7 +19,7 @@ class CustomDatePicker extends Component {
                 <select className="select-css" value={selectedDate} onChange={onDateSelected} disabled={disabled}>
                 {
                     datesOptions.map(el => {
-                        return (<option value={el}>{el}</option>)
+                        return (<option value={el} key={el}>{el}</option>)
                     })
                 }
                 </select>

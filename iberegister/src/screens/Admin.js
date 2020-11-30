@@ -1,5 +1,6 @@
 import React, { Component } from 'react'
-import Firebase from "firebase"
+import Firebase from "firebase/app"
+import 'firebase/database'
 import firebase_config from "../config"
 
 import CustomDatePicker from '../components/CustomDatePicker'
