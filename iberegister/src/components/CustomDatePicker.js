@@ -6,8 +6,7 @@ class CustomDatePicker extends Component {
     constructor(props) {
         super(props)
         this.datesOptions = [""]
-        const nextSundayDate = nextAvailableDate()
-        this.datesOptions[0] = isAvailableReservation(nextSundayDate) ? nextSundayDate : "No disponible"
+        this.datesOptions[0] = nextAvailableDate()
     }
 
     render(){

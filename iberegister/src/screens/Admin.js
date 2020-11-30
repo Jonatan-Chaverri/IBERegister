@@ -22,7 +22,7 @@ class Admin extends Component {
             isLoggedIn: false,
             user: "",
             password: "",
-            reservationDate: nextAvailableDate(new Date()),
+            reservationDate: nextAvailableDate(),
             reservations: {},
             errorMessage: ""
         }
