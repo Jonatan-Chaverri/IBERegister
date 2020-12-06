@@ -13,6 +13,10 @@ export const isValidPhone = phone => {
 export const nextAvailableDate = () => {
     var dateOut = ""
     var currentDate = new Date()
+    if (currentDate.getDay() == 0 && currentDate.getHours() >= 12){
+        // If today is sunday and pass 12 pm, next available date is next sunday
+        currentDate.setDate(currentDate.getDate()+1)
+    }
     currentDate.setDate(currentDate.getDate() + (14-currentDate.getDay()) % 7)
     const y = new Intl.DateTimeFormat('en', { year: 'numeric' }).format(currentDate);
     const m = new Intl.DateTimeFormat('en', { month: 'numeric' }).format(currentDate);
@@ -22,8 +26,16 @@ export const nextAvailableDate = () => {
 }
 
 export const isAvailableReservation = dateIn => {
-    return !(
-        WEEKLY_UNAVAILABLE_DAYS.includes(new Date().getDay()) ||
-        SKIP_DATES.includes(dateIn)
-    )
+    const currentDate = new Date()
+    if (WEEKLY_UNAVAILABLE_DAYS.includes(currentDate.getDay())){
+        return false
+    }
+    if (SKIP_DATES.includes(dateIn)){
+        return false
+    }
+    if (currentDate.getDay() == 0 && currentDate.getHours() < 12){
+        // if sunday morning
+        return false
+    }
+    return true
 }
