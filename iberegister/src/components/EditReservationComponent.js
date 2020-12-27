@@ -40,7 +40,11 @@ class EditReservationForm extends Component {
         const nextSundayDate = nextAvailableDate()
 
         this.state = {
-            guests: ["","",""],
+            guests: [
+                {name: "", kid: false},
+                {name: "", kid: false},
+                {name: "", kid: false}
+            ],
             personalData: {
                 "name": "",
                 "phone": ""
@@ -66,6 +70,7 @@ class EditReservationForm extends Component {
         this.handleClickUpdate = this.handleClickUpdate.bind(this)
         this.getReservationErrors = this.getReservationErrors.bind(this)
         this.handleClickDelete = this.handleClickDelete.bind(this)
+        this.handleKidChange = this.handleKidChange.bind(this)
     }
 
     handleDateChange(event){
@@ -111,9 +116,18 @@ class EditReservationForm extends Component {
             }
             errorMessages.reservationNotFound = false
             const guestsFound = reservation.guests.replace(reservation.name, "").split(",")
+            // Parse guest in string format to object
+            const guests = guestsFound.map(guestName => {
+                let guestObject = {
+                    name: guestName.indexOf('(') == -1 ? guestName : 
+                        guestName.substring(0, guestName.indexOf('(')).trim(),
+                    kid: guestName.includes('(')
+                }
+                return guestObject
+            })
             errorMessages.guests = Array(guestsFound.length).fill(false)
             this.setState({
-                guests: guestsFound,
+                guests: guests,
                 personalData: {
                     name: reservation.name,
                     phone: reservation.phone
@@ -142,11 +156,22 @@ class EditReservationForm extends Component {
     handleInputChange(index, value){
         const {guests, errorMessages} = this.state
         errorMessages.guests[index] = value ? !isValidName(value) : false
-        guests[index] = value
+        guests[index].name = value
         errorMessages.notAvailableSpace = false
         this.setState({
             guests: guests,
             errorMessages: errorMessages
+        })
+    }
+
+    handleKidChange(guestIndex){
+        const {guests} = this.state
+        guests[guestIndex] = {
+            name: guests[guestIndex].name,
+            kid: !guests[guestIndex].kid
+        }
+        this.setState({
+            guests: guests
         })
     }
 
@@ -155,7 +180,7 @@ class EditReservationForm extends Component {
         if (guests.length >= 10){
             return
         }
-        guests.push("")
+        guests.push({name: "", kid: false})
         errorMessages.guests.push(false)
         this.setState({
             errorMessages: errorMessages,
@@ -210,9 +235,15 @@ class EditReservationForm extends Component {
                 currentGuests = currentGuests + guestsFound.length
             }
             const availableSpace = MAX_ALLOWED_GUESTS - currentGuests
-            var filtered = guests.filter(el => {return el.length > 0})
-            filtered.push(personalData.name)
-            if (filtered.length > availableSpace){
+            var filtered = guests.filter(el => {return el.name.length > 0})
+            const filteredNames = filtered.map(el =>{
+                if (el.kid){
+                    return `${el.name} (niño)`
+                }
+                return el.name
+            })
+            filteredNames.push(personalData.name)
+            if (filteredNames.length > availableSpace){
                 errorMessages.notAvailableSpace = true
                 this.setState({
                     updateState: FAILED_STATE,
@@ -221,7 +252,7 @@ class EditReservationForm extends Component {
                 return
             }
             const documentToSave = {
-                guests: filtered.toString(),
+                guests: filteredNames.toString(),
                 name: personalData.name,
                 phone: personalData.phone
             }
@@ -261,7 +292,8 @@ class EditReservationForm extends Component {
             addGuestInput,
             handleClickUpdate,
             getReservationErrors,
-            handleClickDelete
+            handleClickDelete,
+            handleKidChange
         } = this
         return(
             <div className="registerForm">
@@ -306,6 +338,7 @@ class EditReservationForm extends Component {
                     handlePersonalDataChange={handlePersonalDataChange}
                     handleGuestInputChange={handleInputChange}
                     onClickAddGuest={addGuestInput}
+                    handleKidChange={handleKidChange}
                 />
                 <div className="main-block">
                     <div className="main-block horizontal-block">

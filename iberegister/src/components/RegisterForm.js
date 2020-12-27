@@ -37,7 +37,11 @@ class RegisterForm extends Component {
         this.state = {
             reservationDate: nextSundayDate,
             availableSpace: 0,
-            guests: ["","",""],
+            guests: [
+                {name: "", kid: false},
+                {name: "", kid: false},
+                {name: "", kid: false}
+            ],
             personalData: {
                 "name": "",
                 "phone": ""
@@ -58,6 +62,7 @@ class RegisterForm extends Component {
         this.handlePersonalDataChange = this.handlePersonalDataChange.bind(this)
         this.getReservationErrors = this.getReservationErrors.bind(this)
         this.checkAvailableSpace = this.checkAvailableSpace.bind(this)
+        this.handleKidChange = this.handleKidChange.bind(this)
     }
 
     getReservationErrors(){
@@ -98,9 +103,15 @@ class RegisterForm extends Component {
             return
         }
 
-        var filtered = guests.filter(el => {return el.length > 0})
-        filtered.push(personalData.name)
-        if (filtered.length > availableSpace){
+        const filtered = guests.filter(el => {return el.name.length > 0})
+        const filteredNames = filtered.map(el =>{
+            if (el.kid){
+                return `${el.name} (niño)`
+            }
+            return el.name
+        })
+        filteredNames.push(personalData.name)
+        if (filteredNames.length > availableSpace){
             errorMessages.notAvailableSpace = true
             this.setState({
                 errorMessages: errorMessages,
@@ -108,7 +119,7 @@ class RegisterForm extends Component {
             })
             return
         }
-        const guestStr = filtered.toString()
+        const guestStr = filteredNames.toString()
         const documentToSave = {
             guests: guestStr,
             name: personalData.name,
@@ -126,7 +137,7 @@ class RegisterForm extends Component {
         if (guests.length >= MAX_GUESTS_PER_RESERVATION){
             return
         }
-        guests.push("")
+        guests.push({name: "", kid: false})
         errorMessages.guests.push(false)
         this.setState({
             errorMessages: errorMessages,
@@ -137,7 +148,7 @@ class RegisterForm extends Component {
     handleInputChange(index, value){
         const {guests, errorMessages} = this.state
         errorMessages.guests[index] = value ? !isValidName(value) : false
-        guests[index] = value
+        guests[index].name = value
         errorMessages.notAvailableSpace = false
         this.setState({
             guests: guests,
@@ -162,6 +173,17 @@ class RegisterForm extends Component {
                 name: nameValue,
                 phone: formattedPhone
             }
+        })
+    }
+
+    handleKidChange(guestIndex){
+        const {guests} = this.state
+        guests[guestIndex] = {
+            name: guests[guestIndex].name,
+            kid: !guests[guestIndex].kid
+        }
+        this.setState({
+            guests: guests
         })
     }
 
@@ -212,7 +234,8 @@ class RegisterForm extends Component {
             handleInputChange,
             handleDateChange,
             handlePersonalDataChange,
-            getReservationErrors
+            getReservationErrors,
+            handleKidChange
         } = this
         return (
             <div className="registerForm">
@@ -236,6 +259,7 @@ class RegisterForm extends Component {
                     handlePersonalDataChange={handlePersonalDataChange}
                     handleGuestInputChange={handleInputChange}
                     onClickAddGuest={addGuestInput}
+                    handleKidChange={handleKidChange}
                 />
                 <div>
                     <input 

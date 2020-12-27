@@ -10,13 +10,17 @@ class GuestsInputForm extends Component {
             disabled,
             handlePersonalDataChange,
             handleGuestInputChange,
-            onClickAddGuest
+            onClickAddGuest,
+            handleKidChange
         } = this.props
         return(
             <div className="guest-reservation-block">
                 <div className="personal-data-block">
                     <div className="custom-header-text">Datos personales</div>
                     <table>
+                        <tr>
+                            <td className="small-title"><div>&nbsp;</div></td>
+                        </tr>
                         <tr>
                             <th className="table-left">Nombre completo</th>
                             <th className={errorMessages.personalDataName ? "input-error-container" : "input-block"}>
@@ -60,26 +64,50 @@ class GuestsInputForm extends Component {
                 <div className="guests-block">
                     <div className="custom-header-text">Nombres de acompañantes</div>
                     <div>
+                    <table>
+                        <tr>
+                            <th></th>
+                            <th className="table-left small-title">Niño 8 - 12 años</th>
+                        </tr>
                     {
                         guests.map((guest, index) => {
                                 return (
-                                    <div className={errorMessages.guests[index] ? "input-error-container" : "input-block"}>
-                                    <div className="input-error">
-                                        <input 
-                                            type="text"
-                                            value={guest}
-                                            className="text-input"
-                                            disabled={disabled}
-                                            onChange={
-                                                event => handleGuestInputChange(index, event.target.value)
-                                            }
-                                        />
-                                    </div>
-                                    </div>
+                                    <tr>
+                                        <td>
+                                            <div className={`horizontal-block ${errorMessages.guests[index] ? "input-error-container" : "input-block"}`}>
+                                                <div className="input-error">
+                                                    <input 
+                                                        type="text"
+                                                        value={guest.name}
+                                                        className="text-input"
+                                                        disabled={disabled}
+                                                        onChange={
+                                                            event => handleGuestInputChange(index, event.target.value)
+                                                        }
+                                                    />
+                                                </div>
+                                            </div>
+                                        </td>
+                                        <td>
+                                            <label>
+                                              <input
+                                                type="checkbox"
+                                                className="custom-checkbox"
+                                                checked={guest.kid}
+                                                onChange={event => {
+                                                    handleKidChange(index)
+                                                }}
+                                                disabled={disabled}
+                                               />
+                                              <span class="checkmark"></span>
+                                            </label>
+                                        </td>
+                                    </tr>
                                 )
                             }
                         )
                     }
+                    </table>
                         <input 
                             type="button"
                             value="+ Añadir"
