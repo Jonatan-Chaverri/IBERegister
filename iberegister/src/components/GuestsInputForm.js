@@ -67,7 +67,7 @@ class GuestsInputForm extends Component {
                     <table>
                         <tr>
                             <th></th>
-                            <th className="table-left small-title">Niño 8 - 12 años</th>
+                            <th className="table-left small-title">Niño(a) 8 - 12 años</th>
                         </tr>
                     {
                         guests.map((guest, index) => {
