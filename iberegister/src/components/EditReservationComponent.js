@@ -238,11 +238,11 @@ class EditReservationForm extends Component {
             var filtered = guests.filter(el => {return el.name.length > 0})
             const filteredNames = filtered.map(el =>{
                 if (el.kid){
-                    return `${el.name} (niño)`
+                    return `${el.name.trim()} (niño)`
                 }
-                return el.name
+                return el.name.trim()
             })
-            filteredNames.push(personalData.name)
+            filteredNames.push(personalData.name.trim())
             if (filteredNames.length > availableSpace){
                 errorMessages.notAvailableSpace = true
                 this.setState({
@@ -253,7 +253,7 @@ class EditReservationForm extends Component {
             }
             const documentToSave = {
                 guests: filteredNames.toString(),
-                name: personalData.name,
+                name: personalData.name.trim(),
                 phone: personalData.phone
             }
             const dbUrl = `/${reservationDate}/${reservationId}`

@@ -106,11 +106,11 @@ class RegisterForm extends Component {
         const filtered = guests.filter(el => {return el.name.length > 0})
         const filteredNames = filtered.map(el =>{
             if (el.kid){
-                return `${el.name} (niño)`
+                return `${el.name.trim()} (niño)`
             }
-            return el.name
+            return el.name.trim()
         })
-        filteredNames.push(personalData.name)
+        filteredNames.push(personalData.name.trim())
         if (filteredNames.length > availableSpace){
             errorMessages.notAvailableSpace = true
             this.setState({
@@ -122,7 +122,7 @@ class RegisterForm extends Component {
         const guestStr = filteredNames.toString()
         const documentToSave = {
             guests: guestStr,
-            name: personalData.name,
+            name: personalData.name.trim(),
             phone: personalData.phone
         }
         const dbUrl = `/${reservationDate}/${reservationId}`

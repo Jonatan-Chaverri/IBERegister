@@ -2,7 +2,7 @@ import {SKIP_DATES, WEEKLY_UNAVAILABLE_DAYS} from "./config"
 
 export const isValidName = name => {
     const regex = /^[A-Za-zñÑÁ-Źá-ź]{1,15}\s[A-Za-zñÑÁ-Źá-ź]{1,15}(\s[A-Za-zñÑÁ-Źá-ź]{1,15}$|$)/
-    return regex.test(name)
+    return regex.test(name.trim())
 }
 
 export const isValidPhone = phone => {
