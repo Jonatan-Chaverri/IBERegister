@@ -74,8 +74,15 @@ class EditReservationForm extends Component {
     }
 
     handleDateChange(event){
+        const {reservationState} = this.state
+        const selectedDate = event.target.value
+        const isAsamblea = selectedDate.indexOf("Asamblea") >= 0
+        const newReservationState = selectedDate.indexOf("Asamblea") >= 0 ? 
+                PENDING_STATE : isAvailableReservation(selectedDate) ? 
+                PENDING_STATE : UNAVAILABLE_STATE
         this.setState({
-            reservationDate: event.target.value
+            reservationDate: selectedDate,
+            updateState: newReservationState
         })
     }
 
@@ -302,7 +309,7 @@ class EditReservationForm extends Component {
                         <CustomDatePicker
                             selectedDate={reservationDate}
                             onDateSelected={handleDateChange}
-                            disabled={updateState === UNAVAILABLE_STATE}
+                            disabled={[FOUND_STATE, COMPLETED_STATE, DELETED_STATE].includes(updateState)}
                         />
                     </div>
                     <div className="horizontal-block horizontal-space-block">

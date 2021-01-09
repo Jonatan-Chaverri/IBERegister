@@ -189,9 +189,10 @@ class RegisterForm extends Component {
 
     checkAvailableSpace(selectedDate){
         const {reservationState} = this.state
-        if (reservationState === UNAVAILABLE_STATE){
-            return
-        }
+        const isAsamblea = selectedDate.indexOf("Asamblea") >= 0
+        const newReservationState = selectedDate.indexOf("Asamblea") >= 0 ? 
+                PENDING_STATE : isAvailableReservation(selectedDate) ? 
+                PENDING_STATE : UNAVAILABLE_STATE
         const dbUrl = `/${selectedDate}`
         let ref = Firebase.database().ref(dbUrl)
 
@@ -207,7 +208,8 @@ class RegisterForm extends Component {
             }
             this.setState({
                 reservationDate: selectedDate,
-                availableSpace: MAX_ALLOWED_GUESTS - currentGuests
+                availableSpace: MAX_ALLOWED_GUESTS - currentGuests,
+                reservationState: newReservationState
             })
         })
     }
@@ -243,7 +245,7 @@ class RegisterForm extends Component {
                     <CustomDatePicker
                         selectedDate={reservationDate}
                         onDateSelected={handleDateChange}
-                        disabled={reservationState === UNAVAILABLE_STATE}
+                        disabled={false}
                     />
                     {
                         reservationState === UNAVAILABLE_STATE ? 
@@ -255,7 +257,11 @@ class RegisterForm extends Component {
                     personalData={personalData}
                     guests={guests}
                     errorMessages={errorMessages}
-                    disabled={reservationState === COMPLETED_STATE || availableSpace <= 0}
+                    disabled={
+                        reservationState === COMPLETED_STATE || 
+                        reservationState === UNAVAILABLE_STATE || 
+                        availableSpace <= 0
+                    }
                     handlePersonalDataChange={handlePersonalDataChange}
                     handleGuestInputChange={handleInputChange}
                     onClickAddGuest={addGuestInput}
@@ -266,7 +272,11 @@ class RegisterForm extends Component {
                         type="button" 
                         className="button-add-reserve"
                         value={RESERVATION_BUTTON}
-                        disabled={reservationState === COMPLETED_STATE || availableSpace <= 0}
+                        disabled={
+                            reservationState === COMPLETED_STATE || 
+                            reservationState === UNAVAILABLE_STATE || 
+                            availableSpace <= 0
+                        }
                         onClick={createReservation}></input>
                 </div>
                 <div className="reservation-result-block-container">
