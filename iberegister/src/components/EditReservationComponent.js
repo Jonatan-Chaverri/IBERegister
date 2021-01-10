@@ -3,6 +3,7 @@ import Firebase from "firebase/app"
 import 'firebase/database'
 import {MAX_ALLOWED_GUESTS} from "../config"
 import CustomDatePicker from './CustomDatePicker'
+import CustomRadioButton from './CustomRadioButton'
 import GuestsInputForm from './GuestsInputForm'
 import {nextAvailableDate, isValidName, isValidPhone, isAvailableReservation} from '../utils'
 
@@ -306,7 +307,7 @@ class EditReservationForm extends Component {
             <div className="registerForm">
                 <div className="guests-block">
                     <div className="horizontal-block horizontal-space-block">
-                        <CustomDatePicker
+                        <CustomRadioButton
                             selectedDate={reservationDate}
                             onDateSelected={handleDateChange}
                             disabled={[FOUND_STATE, COMPLETED_STATE, DELETED_STATE].includes(updateState)}

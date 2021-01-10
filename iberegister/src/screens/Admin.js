@@ -3,7 +3,7 @@ import Firebase from "firebase/app"
 import 'firebase/database'
 import firebase_config from "../config"
 
-import CustomDatePicker from '../components/CustomDatePicker'
+import CustomRadioButton from '../components/CustomRadioButton'
 import ReservationsDisplay from '../components/ReservationsDisplay'
 import {FaTimesCircle } from 'react-icons/fa'
 
@@ -135,7 +135,7 @@ class Admin extends Component {
                         isLoggedIn ?
                         <div>
                             <div class="date-selection-block">
-                                <CustomDatePicker 
+                                <CustomRadioButton 
                                     selectedDate={reservationDate}
                                     onDateSelected={event => handleDateChange(event.target.value)}
                                     disabled={!isLoggedIn}

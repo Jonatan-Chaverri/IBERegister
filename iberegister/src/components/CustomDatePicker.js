@@ -7,7 +7,6 @@ class CustomDatePicker extends Component {
         super(props)
         this.datesOptions = [""]
         this.datesOptions[0] = nextAvailableDate()
-        this.datesOptions[1] = "Asamblea - 2020-1-19"
     }
 
     render(){

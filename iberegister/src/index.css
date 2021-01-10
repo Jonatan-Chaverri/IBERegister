@@ -498,7 +498,6 @@ body {
 }
 
 .horizontal-block{
-  display: inline-block;
   padding-right: 10px;
 }
 
@@ -572,4 +571,42 @@ body {
 
 .table-center{
   text-align: center;
+}
+
+.radio-table-row{
+  line-height: 30px;
+}
+
+
+.radio-label {
+  height: 10px;
+  width: 50px;
+  padding-left: 0px;
+  font-size: 17px;
+  font-weight: bold;
+  user-select: none;
+  color: #000000;
+  letter-spacing: 1px;
+  font-family: "Raleway", sans-serif;
+  &:hover input:not(:checked) ~ .radio {
+    opacity: 0.8;
+  }
+}
+
+.radio-label-selected {
+  height: 10px;
+  width: 50px;
+  padding-left: 0px;
+  font-size: 17px;
+  user-select: none;
+  color: #2E7A98;
+  letter-spacing: 1px;
+  font-family: "Raleway", sans-serif;
+  &:hover input:not(:checked) ~ .radio {
+    opacity: 0.8;
+  }
+}
+
+.line-divisor{
+  padding-left: 0;
 }
