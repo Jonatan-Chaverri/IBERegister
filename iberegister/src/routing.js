@@ -1,16 +1,19 @@
 import React from 'react';
 import { BrowserRouter, Switch, Route } from 'react-router-dom';
-import { Home, Admin } from './screens'
+import { Home, Admin, Conferencia } from './screens'
 
 export default function App() {
     return (
       <BrowserRouter>
         <Switch>
           <Route exact path="/">
-            <Home pageType="reservation"/> 
+            <Home pageType="reservation"/>
+          </Route>
+          <Route exact path="/conferencia">
+            <Conferencia pageType="reservation"/>
           </Route>
           <Route exact path="/admin">
-            <Admin/> 
+            <Admin/>
           </Route>
         </Switch>
       </BrowserRouter>

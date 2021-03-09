@@ -23,7 +23,16 @@ class Admin extends Component {
             user: "",
             password: "",
             reservationDate: nextAvailableDate(),
+            availableDates: [
+                nextAvailableDate(),
+                'Jueves(18-3)',
+                'Viernes(19-3)',
+                'Sabado(20-3)',
+                'Domingo(21-3)'
+            ],
             reservations: {},
+            sundayReservations: {},
+            confReservations: {},
             errorMessage: ""
         }
 
@@ -34,17 +43,14 @@ class Admin extends Component {
     }
 
     handleDateChange(selectedDate){
-        let ref = Firebase.database().ref(`/${selectedDate}`)
-
-        ref.on('value', snapshot => {
-            var reservations = snapshot.val();
-            if (reservations == null) {
-                reservations = {}
-            }
-            this.setState({
-                reservationDate: selectedDate,
-                reservations: reservations
-            })
+        const {confReservations, sundayReservations} = this.state
+        var reservations = selectedDate.includes('(') ? confReservations[selectedDate] : sundayReservations
+        if (!reservations){
+            reservations = {}
+        }
+        this.setState({
+            reservationDate: selectedDate,
+            reservations: reservations
         })
     }
 
@@ -76,8 +82,33 @@ class Admin extends Component {
         })
     }
 
+    componentDidMount(){
+        let ref = Firebase.database().ref(`/${nextAvailableDate()}`)
+
+        ref.on('value', snapshot => {
+            var reservations = snapshot.val();
+            if (reservations == null) {
+                reservations = {}
+            }
+            this.setState({
+                sundayReservations: reservations
+            })
+        })
+        const refConf = Firebase.database().ref(`/conferencia`)
+
+        refConf.on('value', snapshot => {
+            var reservations = snapshot.val();
+            if (reservations == null) {
+                reservations = {}
+            }
+            this.setState({
+                confReservations: reservations
+            })
+        })
+    }
+
     render(){
-        const {reservationDate, user, isLoggedIn, password, reservations, errorMessage} = this.state
+        const {reservationDate, availableDates, user, isLoggedIn, password, reservations, errorMessage} = this.state
         const {handleDateChange, handleUserChange, handlePassChange, handleClickValidate} = this
         return(
             <div>
@@ -91,7 +122,7 @@ class Admin extends Component {
                             <th>Usuario</th>
                             <th>
                             <div className="input-error">
-                                <input 
+                                <input
                                     type="text"
                                     className="text-input"
                                     value={user}
@@ -105,7 +136,7 @@ class Admin extends Component {
                             <th>Contrasena</th>
                             <th>
                             <div className="input-error">
-                                <input 
+                                <input
                                     type="password"
                                     className="text-input"
                                     value={password}
@@ -117,7 +148,7 @@ class Admin extends Component {
                         </tr>
                     </table>
                     <div className="main-block">
-                        <input 
+                        <input
                             class="button-add-reserve"
                             type="button"
                             value="Validar"
@@ -135,12 +166,21 @@ class Admin extends Component {
                         isLoggedIn ?
                         <div>
                             <div class="date-selection-block">
-                                <CustomDatePicker 
-                                    selectedDate={reservationDate}
-                                    onDateSelected={event => handleDateChange(event.target.value)}
-                                    disabled={!isLoggedIn}
-                                />
-                            </div> 
+                                <div className="custom-date-picker">
+                                    <div className="custom-header-text">Fecha de reservación</div>
+                                    <select
+                                        className="select-css"
+                                        value={reservationDate}
+                                        onChange={event => handleDateChange(event.target.value)}
+                                    >
+                                    {
+                                        availableDates.map(el => {
+                                            return (<option value={el} key={el}>{el}</option>)
+                                        })
+                                    }
+                                    </select>
+                                </div>
+                            </div>
                             <ReservationsDisplay reservations={reservations} reservationDate={reservationDate}/>
                         </div>: <div class="date-selection-block"> &nbsp;</div>
                     }

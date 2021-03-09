@@ -212,7 +212,7 @@ body {
     /* It'd be nice to use -webkit-focus-ring-color here but it doesn't work on box-shadow */
     box-shadow: 0 0 1px 3px rgba(59, 153, 252, .7);
     box-shadow: 0 0 0 3px -moz-mac-focusring;
-    color: #222; 
+    color: #222;
     outline: none;
 }
 
@@ -236,6 +236,16 @@ body {
     margin: 0 0.5rem;
     padding-bottom: 20px;
     transform: translateY(1rem);
+}
+
+.custom-header-title{
+    font-size: 20px;
+    font-family: "Montserrat", sans-serif;
+    font-weight: bold;
+    padding-bottom: 5px;
+    margin-bottom: 20px;
+    border-bottom: 5px solid #13ace5;
+    max-width: 500px;
 }
 
 .date-selection-block{
@@ -572,4 +582,33 @@ body {
 
 .table-center{
   text-align: center;
+}
+
+.custom-checkbox{
+    font-size: 15px;
+    font-family: "Montserrat", sans-serif;
+    float: left;
+}
+
+.checkbox-table-row{
+  padding-bottom: 55px;
+  min-height: 55px;
+}
+
+.radio-label{
+  padding-bottom: 25px;
+  min-height: 25px;
+}
+
+.inline-text {
+  float: left;
+  padding-left: 10px;
+}
+
+.inline-text-red{
+  float: left;
+  padding-left: 10px;
+  color: red;
+  font-family: "Montserrat", sans-serif;
+  text-decoration: underline;
 }
