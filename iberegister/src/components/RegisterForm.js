@@ -207,7 +207,7 @@ class RegisterForm extends Component {
             }
             this.setState({
                 reservationDate: selectedDate,
-                availableSpace: MAX_ALLOWED_GUESTS - currentGuests
+                availableSpace: MAX_ALLOWED_GUESTS - currentGuests > 0 ? MAX_ALLOWED_GUESTS - currentGuests : 0
             })
         })
     }
@@ -246,7 +246,7 @@ class RegisterForm extends Component {
                         disabled={reservationState === UNAVAILABLE_STATE}
                     />
                     {
-                        reservationState === UNAVAILABLE_STATE ? 
+                        reservationState === UNAVAILABLE_STATE ?
                         <div className="custom-subtitle">{UNAVAILABLE_DATE_MSG}</div> :
                         <div className="custom-subtitle">Quedan {availableSpace} espacios</div>
                     }
@@ -262,8 +262,8 @@ class RegisterForm extends Component {
                     handleKidChange={handleKidChange}
                 />
                 <div>
-                    <input 
-                        type="button" 
+                    <input
+                        type="button"
                         className="button-add-reserve"
                         value={RESERVATION_BUTTON}
                         disabled={reservationState === COMPLETED_STATE || availableSpace <= 0}
@@ -274,7 +274,7 @@ class RegisterForm extends Component {
                     ![PENDING_STATE, UNAVAILABLE_STATE].includes(reservationState) ?
                             <div className="reservation-result-block">
                                 <div className="reservation-status-block">
-                                    {reservationState === COMPLETED_STATE? 
+                                    {reservationState === COMPLETED_STATE?
                                       <p>{RESERVATION_SUCCESS}  <FaCheckCircle className="icon-check-circle"/></p>:
                                       <p>{RESERVATION_FAILED} <FaTimesCircle className="icon-fail-circle"/></p> }
                                 </div>

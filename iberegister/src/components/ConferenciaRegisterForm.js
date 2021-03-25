@@ -1,7 +1,7 @@
 import React, { Component } from 'react'
 import Firebase from "firebase/app"
 import 'firebase/database'
-import {MAX_ALLOWED_GUESTS, MAX_GUESTS_PER_RESERVATION} from "../config"
+import {CONF_MAX_ALLOWED_GUESTS, MAX_GUESTS_PER_RESERVATION} from "../config"
 import ConferenciaDatePicker from './ConferenciaDatePicker'
 import GuestsInputForm from './GuestsInputForm'
 import {nextAvailableDate, isValidName, isValidPhone, isAvailableReservation} from '../utils'
@@ -244,10 +244,10 @@ class ConferenciaRegisterForm extends Component {
                 confDays = {}
             }
             var availableDates = {
-                'Jueves(18-3)': MAX_ALLOWED_GUESTS,
-                'Viernes(19-3)': MAX_ALLOWED_GUESTS,
-                'Sabado(20-3)': MAX_ALLOWED_GUESTS,
-                'Domingo(21-3)': MAX_ALLOWED_GUESTS
+                'Jueves(18-3)': CONF_MAX_ALLOWED_GUESTS,
+                'Viernes(19-3)': CONF_MAX_ALLOWED_GUESTS,
+                'Sabado(20-3)': CONF_MAX_ALLOWED_GUESTS,
+                'Domingo(21-3)': CONF_MAX_ALLOWED_GUESTS
             }
             for (var confDay in confDays){
                 var currentGuests = 0
