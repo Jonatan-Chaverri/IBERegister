@@ -1,7 +1,7 @@
 import React, { Component } from 'react'
 import Firebase from "firebase/app"
 import 'firebase/database'
-import {MAX_ALLOWED_GUESTS} from "../config"
+import {CONF_MAX_ALLOWED_GUESTS} from "../config"
 import CustomDatePicker from './CustomDatePicker'
 import GuestsInputForm from './GuestsInputForm'
 import ConferenciaDatePicker from './ConferenciaDatePicker'
@@ -274,7 +274,7 @@ class EditReservationForm extends Component {
                 const guestsFound = reservations[reservation].guests.split(",")
                 currentGuests = currentGuests + guestsFound.length
             }
-            const availableSpace = MAX_ALLOWED_GUESTS - currentGuests
+            const availableSpace = CONF_MAX_ALLOWED_GUESTS - currentGuests
             if (filteredNames.length > availableSpace){
                 const confDaysOredered = [
                     'Jueves(18-3)',
