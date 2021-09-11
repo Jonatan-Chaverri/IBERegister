@@ -65,12 +65,12 @@ export const getCurrentWeek = () => {
         [weekId]: {
             [sundayAmStr]: {
                 label: `Domingo ${sundayStr.substring(5)} 9:00am`,
-                available: currentDate < nextSundayDate,
+                available: isAvailableReservation(sundayStr),
                 space: 0
             },
             [sundayPmStr]: {
                 label: `Domingo ${sundayStr.substring(5)} 11:00am`,
-                available: currentDate < nextSundayDate,
+                available: isAvailableReservation(sundayStr),
                 space: 0
             }
         }
