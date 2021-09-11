@@ -573,3 +573,100 @@ body {
 .table-center{
   text-align: center;
 }
+
+.container-day-picker{
+  display: block;
+  margin-bottom: 60px;
+}
+
+@media(max-width: 391px){
+  .container-day-picker{
+    display: block;
+    margin-bottom: 120px;
+  }
+}
+
+.day-picker-container{
+  display: block;
+  float: left;
+  min-width: 100px;
+  min-height: 60px;
+  padding-right: 10px;
+}
+
+@media(max-width: 391px){
+    .day-picker-container{
+      display: block;
+      float: left;
+      min-width: 100px;
+      min-height: 60px;
+      padding-right: 10px;
+      padding-top: 10px;
+    }
+}
+
+.day-selection{
+    width: 130px;
+    height: 60px;
+    min-width: 50px;
+    padding: 5px 5px 5px 5px;
+    position: relative;
+    text-align: center;
+    background: rgb(244,242,242);
+    background: radial-gradient(circle, rgba(244,242,242,1) 0%, rgba(224,217,218,1) 71%);
+    font-size: 17px;
+    font-family: "Raleway", sans-serif;
+    font-weight: bold;
+    border-radius: 10px;
+    border: 2px solid black;
+}
+
+.day-selection-selected{
+    width: 130px;
+    height: 60px;
+    min-width: 50px;
+    padding: 5px 5px 5px 5px;
+    position: relative;
+    text-align: center;
+    background: #13ace5;
+    color: white;
+    font-size: 17px;
+    font-family: "Raleway", sans-serif;
+    font-weight: bold;
+    border-radius: 10px;
+    border: 2px solid black;
+}
+
+.day-selection-disabled{
+    width: 130px;
+    height: 60px;
+    min-width: 50px;
+    padding: 5px 5px 5px 5px;
+    position: relative;
+    text-align: center;
+    background: gray;
+    color: black;
+    font-size: 17px;
+    font-family: "Raleway", sans-serif;
+    font-weight: bold;
+    border-radius: 10px;
+    border: 2px solid black;
+}
+
+.day-selection:hover{
+    background: #13ace5;
+}
+
+.edit-reservation-search-block{
+    display: block;
+}
+
+.edit-reservation-date-picker{
+    display: inline-block;
+    margin: 0px 30px 0px 0px;
+}
+
+.edit-reservation-search-res-id{
+    display: inline-block;
+    vertical-align: top;
+}

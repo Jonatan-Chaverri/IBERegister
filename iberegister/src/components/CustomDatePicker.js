@@ -6,12 +6,10 @@ class CustomDatePicker extends Component {
     constructor(props) {
         super(props)
         this.datesOptions = [""]
-        this.datesOptions[0] = nextAvailableDate()
     }
 
     render(){
-        const {selectedDate, onDateSelected, disabled} = this.props
-        const {datesOptions} = this
+        const {selectedDate, onDateSelected, datesOptions, disabled} = this.props
         return(
             <div className="custom-date-picker">
                 <div className="custom-header-text">Fecha de reservación</div>

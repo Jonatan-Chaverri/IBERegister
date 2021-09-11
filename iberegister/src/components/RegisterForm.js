@@ -4,7 +4,8 @@ import 'firebase/database'
 import {MAX_ALLOWED_GUESTS, MAX_GUESTS_PER_RESERVATION} from "../config"
 import CustomDatePicker from './CustomDatePicker'
 import GuestsInputForm from './GuestsInputForm'
-import {nextAvailableDate, isValidName, isValidPhone, isAvailableReservation} from '../utils'
+import CustomDayPicker from './CustomDayPicker'
+import {nextAvailableDate, isValidName, isValidPhone, isAvailableReservation, getCurrentWeek} from '../utils'
 
 import {
     NO_ROOM_ERROR,
@@ -32,11 +33,12 @@ class RegisterForm extends Component {
     constructor(props) {
         super(props)
 
-        const nextSundayDate = nextAvailableDate()
+        const currentWeekInfo = getCurrentWeek()
+        this.currentWeekId = Object.keys(currentWeekInfo)[0]
 
         this.state = {
-            reservationDate: nextSundayDate,
-            availableSpace: 0,
+            reservationDate: "",
+            currentWeek: currentWeekInfo,
             guests: [
                 {name: "", kid: false},
                 {name: "", kid: false},
@@ -47,7 +49,7 @@ class RegisterForm extends Component {
                 "phone": ""
             },
             reservationId: Math.random().toString(36).substr(2, 9),
-            reservationState: isAvailableReservation(nextSundayDate) ? PENDING_STATE: UNAVAILABLE_STATE,
+            reservationState: PENDING_STATE,
             errorMessages: {
                 personalDataName: false,
                 personalDataPhone: false,
@@ -61,7 +63,6 @@ class RegisterForm extends Component {
         this.handleDateChange = this.handleDateChange.bind(this)
         this.handlePersonalDataChange = this.handlePersonalDataChange.bind(this)
         this.getReservationErrors = this.getReservationErrors.bind(this)
-        this.checkAvailableSpace = this.checkAvailableSpace.bind(this)
         this.handleKidChange = this.handleKidChange.bind(this)
     }
 
@@ -90,11 +91,11 @@ class RegisterForm extends Component {
             personalData,
             reservationDate,
             reservationId,
-            availableSpace,
-            errorMessages
+            errorMessages,
+            currentWeek
         } = this.state
 
-        const {getReservationErrors} = this
+        const {getReservationErrors, currentWeekId} = this
         const reservationErrors = getReservationErrors()
         if (reservationErrors){
             this.setState({
@@ -103,6 +104,16 @@ class RegisterForm extends Component {
             return
         }
 
+        if (reservationDate.length === 0){
+            this.setState({
+                reservationState: FAILED_STATE
+            })
+            return
+        }
+
+        // Check out space
+        const availableSpace = currentWeek[currentWeekId][reservationDate].space
+
         const filtered = guests.filter(el => {return el.name.length > 0})
         const filteredNames = filtered.map(el =>{
             if (el.kid){
@@ -110,8 +121,11 @@ class RegisterForm extends Component {
             }
             return el.name.trim()
         })
+
         filteredNames.push(personalData.name.trim())
-        if (filteredNames.length > availableSpace){
+        const guestStr = filteredNames.toString()
+        const kidsCount = (guestStr.match(/(niño)/g) || []).length
+        if ((filteredNames.length - kidsCount) > availableSpace){
             errorMessages.notAvailableSpace = true
             this.setState({
                 errorMessages: errorMessages,
@@ -119,14 +133,16 @@ class RegisterForm extends Component {
             })
             return
         }
-        const guestStr = filteredNames.toString()
+
+        // Save document
         const documentToSave = {
             guests: guestStr,
             name: personalData.name.trim(),
             phone: personalData.phone
         }
-        const dbUrl = `/${reservationDate}/${reservationId}`
+        const dbUrl = `/${currentWeekId}/${reservationDate}/${reservationId}`
         Firebase.database().ref(dbUrl).set(documentToSave)
+
         this.setState({
             reservationState: COMPLETED_STATE
         })
@@ -156,9 +172,13 @@ class RegisterForm extends Component {
         })
     }
 
-    handleDateChange(event){
-        const {checkAvailableSpace} = this
-        checkAvailableSpace(event.target.value)
+    handleDateChange(selectedDate){
+        const {errorMessages} = this.state
+        errorMessages.notAvailableSpace = false
+        this.setState({
+            reservationDate: selectedDate,
+            errorMessages: errorMessages
+        })
     }
 
     handlePersonalDataChange(nameValue, phoneValue){
@@ -187,35 +207,32 @@ class RegisterForm extends Component {
         })
     }
 
-    checkAvailableSpace(selectedDate){
-        const {reservationState} = this.state
-        if (reservationState === UNAVAILABLE_STATE){
-            return
-        }
-        const dbUrl = `/${selectedDate}`
-        let ref = Firebase.database().ref(dbUrl)
-
+    componentDidMount(){
+        const {currentWeekId} = this
+        let ref = Firebase.database().ref(`/${currentWeekId}`)
         ref.on('value', snapshot => {
-            var reservations = snapshot.val();
-            if (reservations == null) {
-                reservations = {}
+            const {currentWeek} = this.state
+            var weekRef = snapshot.val();
+            if (weekRef == null){
+                weekRef = {}
             }
-            var currentGuests = 0
-            for (var reservation in reservations){
-                const guestsFound = reservations[reservation].guests.split(",")
-                currentGuests = currentGuests + guestsFound.length
+            for (var dayRef in currentWeek[currentWeekId]){
+                var currentGuests = 0
+                const reservations = weekRef[dayRef] ? weekRef[dayRef] : {}
+                for (var reservation in reservations){
+                    const kidsCount = (
+                        reservations[reservation].guests.match(/(niño)/g) || []
+                    ).length
+                    const guestsFound = reservations[reservation].guests.split(",")
+                    currentGuests = currentGuests + guestsFound.length - kidsCount
+                }
+                const availableSpace = MAX_ALLOWED_GUESTS - currentGuests
+                currentWeek[currentWeekId][dayRef].space = availableSpace
             }
             this.setState({
-                reservationDate: selectedDate,
-                availableSpace: MAX_ALLOWED_GUESTS - currentGuests
+                currentWeek: currentWeek
             })
         })
-    }
-
-    componentDidMount(){
-        const {reservationDate} = this.state
-        const {checkAvailableSpace} = this
-        checkAvailableSpace(reservationDate)
     }
 
     render() {
@@ -225,8 +242,8 @@ class RegisterForm extends Component {
             guests,
             personalData,
             errorMessages,
-            availableSpace,
-            reservationId
+            reservationId,
+            currentWeek
         } = this.state
         const {
             addGuestInput,
@@ -235,21 +252,19 @@ class RegisterForm extends Component {
             handleDateChange,
             handlePersonalDataChange,
             getReservationErrors,
-            handleKidChange
+            handleKidChange,
+            currentWeekId
         } = this
+        const availableSpace = reservationDate ? currentWeek[currentWeekId][reservationDate].space : 0
         return (
             <div className="registerForm">
                 <div className="date-selection-block">
-                    <CustomDatePicker
-                        selectedDate={reservationDate}
+                    <CustomDayPicker
+                        currentWeek={currentWeek}
+                        selectedDay={reservationDate}
                         onDateSelected={handleDateChange}
-                        disabled={reservationState === UNAVAILABLE_STATE}
+                        disabled={reservationState === COMPLETED_STATE}
                     />
-                    {
-                        reservationState === UNAVAILABLE_STATE ? 
-                        <div className="custom-subtitle">{UNAVAILABLE_DATE_MSG}</div> :
-                        <div className="custom-subtitle">Quedan {availableSpace} espacios</div>
-                    }
                 </div>
                 <GuestsInputForm
                     personalData={personalData}

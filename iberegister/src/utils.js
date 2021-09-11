@@ -39,3 +39,41 @@ export const isAvailableReservation = dateIn => {
     }
     return true
 }
+
+export const dateToString = (dateIn) => {
+    const y = new Intl.DateTimeFormat('en', { year: 'numeric' }).format(dateIn);
+    const m = new Intl.DateTimeFormat('en', { month: 'numeric' }).format(dateIn);
+    const d = new Intl.DateTimeFormat('en', { day: '2-digit' }).format(dateIn);
+    const dateOut = `${y}-${d}-${m}`
+    return dateOut
+}
+
+export const getCurrentWeek = () => {
+    // Find next sunday date that will be the week number on db
+    var nextSundayDate = new Date()
+    nextSundayDate.setDate(nextSundayDate.getDate() + (14-nextSundayDate.getDay()) % 7)
+
+    var currentDate = new Date()
+
+    const sundayStr = dateToString(nextSundayDate)
+    const sundayAmStr = `${sundayStr}-9am`
+    const sundayPmStr = `${sundayStr}-11am`
+    const weekId = `v2-${sundayStr}`
+
+    // Create output week reference
+    const out = {
+        [weekId]: {
+            [sundayAmStr]: {
+                label: `Domingo ${sundayStr.substring(5)} 9:00am`,
+                available: currentDate < nextSundayDate,
+                space: 0
+            },
+            [sundayPmStr]: {
+                label: `Domingo ${sundayStr.substring(5)} 11:00am`,
+                available: currentDate < nextSundayDate,
+                space: 0
+            }
+        }
+    }
+    return out
+}

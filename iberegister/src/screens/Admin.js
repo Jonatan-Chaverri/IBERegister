@@ -8,7 +8,7 @@ import ReservationsDisplay from '../components/ReservationsDisplay'
 import {FaTimesCircle } from 'react-icons/fa'
 
 import {ADMIN_USER, ADMIN_PASSWORD} from '../config'
-import {nextAvailableDate} from '../utils'
+import {nextAvailableDate, getCurrentWeek} from '../utils'
 
 
 class Admin extends Component {
@@ -18,11 +18,20 @@ class Admin extends Component {
 
         Firebase.initializeApp(firebase_config)
 
+        const currentWeekInfo = getCurrentWeek()
+        this.currentWeekId = Object.keys(currentWeekInfo)[0]
+        const datesOptions = Object.keys(currentWeekInfo[this.currentWeekId]).map(dayId =>{
+            return currentWeekInfo[this.currentWeekId][dayId].label
+        })
+
         this.state = {
             isLoggedIn: false,
             user: "",
             password: "",
-            reservationDate: nextAvailableDate(),
+            currentWeekReservations: {},
+            currentWeek: currentWeekInfo,
+            reservationDate: datesOptions[0],
+            datesOptions: datesOptions,
             reservations: {},
             errorMessage: ""
         }
@@ -34,17 +43,9 @@ class Admin extends Component {
     }
 
     handleDateChange(selectedDate){
-        let ref = Firebase.database().ref(`/${selectedDate}`)
-
-        ref.on('value', snapshot => {
-            var reservations = snapshot.val();
-            if (reservations == null) {
-                reservations = {}
-            }
-            this.setState({
-                reservationDate: selectedDate,
-                reservations: reservations
-            })
+        // Find id of selected date
+        this.setState({
+            reservationDate: selectedDate
         })
     }
 
@@ -61,13 +62,21 @@ class Admin extends Component {
     }
 
     handleClickValidate(event){
-        const {user, password, reservationDate} = this.state
-        const {handleDateChange}= this
+        const {user, password} = this.state
+        const {currentWeekId}= this
         if (user === ADMIN_USER && password === ADMIN_PASSWORD){
-            handleDateChange(reservationDate)
-            this.setState({
-                errorMessage: "",
-                isLoggedIn: true
+            let ref = Firebase.database().ref(`/${currentWeekId}`)
+
+            ref.on('value', snapshot => {
+                var weekRef = snapshot.val();
+                if (weekRef == null){
+                    weekRef = {}
+                }
+                this.setState({
+                    currentWeekReservations: weekRef,
+                    errorMessage: "",
+                    isLoggedIn: true
+                })
             })
             return
         }
@@ -77,8 +86,25 @@ class Admin extends Component {
     }
 
     render(){
-        const {reservationDate, user, isLoggedIn, password, reservations, errorMessage} = this.state
-        const {handleDateChange, handleUserChange, handlePassChange, handleClickValidate} = this
+        const {
+            reservationDate,
+            currentWeek,
+            user,
+            isLoggedIn,
+            password,
+            errorMessage,
+            datesOptions,
+            currentWeekReservations
+        } = this.state
+        const {handleDateChange, handleUserChange, handlePassChange, handleClickValidate, currentWeekId} = this
+        // Find reservation Day ID
+        var reservations = {}
+        for (var dayId in currentWeek[currentWeekId]){
+            if (currentWeek[currentWeekId][dayId].label === reservationDate){
+                reservations = currentWeekReservations[dayId] ? currentWeekReservations[dayId] : {}
+                break
+            }
+        }
         return(
             <div>
                 <div class="topnav">
@@ -137,6 +163,7 @@ class Admin extends Component {
                             <div class="date-selection-block">
                                 <CustomDatePicker 
                                     selectedDate={reservationDate}
+                                    datesOptions={datesOptions}
                                     onDateSelected={event => handleDateChange(event.target.value)}
                                     disabled={!isLoggedIn}
                                 />

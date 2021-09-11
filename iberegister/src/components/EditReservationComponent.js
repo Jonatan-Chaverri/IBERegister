@@ -2,9 +2,9 @@ import React, { Component } from 'react'
 import Firebase from "firebase/app"
 import 'firebase/database'
 import {MAX_ALLOWED_GUESTS} from "../config"
-import CustomDatePicker from './CustomDatePicker'
+import CustomDayPicker from './CustomDayPicker'
 import GuestsInputForm from './GuestsInputForm'
-import {nextAvailableDate, isValidName, isValidPhone, isAvailableReservation} from '../utils'
+import {nextAvailableDate, isValidName, isValidPhone, isAvailableReservation, getCurrentWeek} from '../utils'
 
 import {
     NO_ROOM_ERROR,
@@ -37,9 +37,11 @@ class EditReservationForm extends Component {
     constructor(props) {
         super(props)
 
-        const nextSundayDate = nextAvailableDate()
+        const currentWeekInfo = getCurrentWeek()
+        this.currentWeekId = Object.keys(currentWeekInfo)[0]
 
         this.state = {
+            currentWeek: currentWeekInfo,
             guests: [
                 {name: "", kid: false},
                 {name: "", kid: false},
@@ -50,8 +52,8 @@ class EditReservationForm extends Component {
                 "phone": ""
             },
             reservationId: "",
-            updateState: isAvailableReservation(nextSundayDate) ? PENDING_STATE : UNAVAILABLE_STATE,
-            reservationDate: nextSundayDate,
+            updateState: PENDING_STATE,
+            reservationDate: "",
             errorMessages: {
                 personalDataName: false,
                 personalDataPhone: false,
@@ -73,9 +75,12 @@ class EditReservationForm extends Component {
         this.handleKidChange = this.handleKidChange.bind(this)
     }
 
-    handleDateChange(event){
+    handleDateChange(selectedDate){
+        const {errorMessages} = this.state
+        errorMessages.notAvailableSpace = false
         this.setState({
-            reservationDate: event.target.value
+            reservationDate: selectedDate,
+            errorMessages: errorMessages
         })
     }
 
@@ -90,7 +95,8 @@ class EditReservationForm extends Component {
     }
 
     handleClickSearch(event){
-        const {reservationId, reservationDate, errorMessages} = this.state
+        const {reservationId, reservationDate, errorMessages, currentWeek} = this.state
+        const {currentWeekId, tryFindReservation} = this
         if (reservationId.length < 9){
             // Reservation code should have 9 digits exactly
             errorMessages.reservationNotValid = true
@@ -101,31 +107,21 @@ class EditReservationForm extends Component {
             return
         }
         errorMessages.reservationNotValid = false
-        const dbUrl = `/${reservationDate}/${reservationId}`
-        let ref = Firebase.database().ref(dbUrl)
 
-        ref.on('value', snapshot => {
-            var reservation = snapshot.val();
-            ref.off('value')
-            if (reservation == null){
-                errorMessages.reservationNotFound = true
-                this.setState({
-                    errorMessages: errorMessages
-                })
-                return
-            }
-            errorMessages.reservationNotFound = false
+        if (currentWeek[currentWeekId][reservationDate].reservations[reservationId]){
+             // Reservation found
+            const reservation = currentWeek[currentWeekId][reservationDate].reservations[reservationId]
             const guestsFound = reservation.guests.replace(reservation.name, "").split(",")
-            // Parse guest in string format to object
             const guests = guestsFound.map(guestName => {
                 let guestObject = {
-                    name: guestName.indexOf('(') == -1 ? guestName : 
+                    name: guestName.indexOf('(') === -1 ? guestName :
                         guestName.substring(0, guestName.indexOf('(')).trim(),
                     kid: guestName.includes('(')
                 }
                 return guestObject
             })
-            errorMessages.guests = Array(guestsFound.length).fill(false)
+            errorMessages.reservationNotFound = false
+            errorMessages.reservationNotValid = false
             this.setState({
                 guests: guests,
                 personalData: {
@@ -133,9 +129,18 @@ class EditReservationForm extends Component {
                     phone: reservation.phone
                 },
                 updateState: FOUND_STATE,
-                errorMessages: errorMessages
+                errorMessages: errorMessages,
+                reservationDate: reservationDate
             })
+            return
+        }
+        // Reservation not found
+        errorMessages.reservationNotFound = true
+        this.setState({
+            errorMessages: errorMessages
         })
+        return
+
     }
 
     handlePersonalDataChange(nameValue, phoneValue){
@@ -208,8 +213,14 @@ class EditReservationForm extends Component {
     }
 
     handleClickUpdate(){
-        const {guests, personalData, reservationDate, reservationId, errorMessages} = this.state
-        const {getReservationErrors} = this
+        const {
+            guests,
+            personalData,
+            reservationDate,
+            reservationId,
+            errorMessages,
+            currentWeek} = this.state
+        const {getReservationErrors, currentWeekId} = this
 
         if (getReservationErrors()){
             this.setState({
@@ -217,59 +228,79 @@ class EditReservationForm extends Component {
             })
             return
         }
-        const dbUrl = `/${reservationDate}`
-        let ref = Firebase.database().ref(dbUrl)
 
-        ref.on('value', snapshot => {
-            var reservations = snapshot.val();
-            ref.off('value')
-            if (reservations == null) {
-                reservations = {}
+        var filtered = guests.filter(el => {return el.name.length > 0})
+        const filteredNames = filtered.map(el =>{
+            if (el.kid){
+                return `${el.name.trim()} (niño)`
             }
-            var currentGuests = 0
-            for (var reservation in reservations){
-                if (reservation === reservationId){
-                    continue
-                }
-                const guestsFound = reservations[reservation].guests.split(",")
-                currentGuests = currentGuests + guestsFound.length
-            }
-            const availableSpace = MAX_ALLOWED_GUESTS - currentGuests
-            var filtered = guests.filter(el => {return el.name.length > 0})
-            const filteredNames = filtered.map(el =>{
-                if (el.kid){
-                    return `${el.name.trim()} (niño)`
-                }
-                return el.name.trim()
-            })
-            filteredNames.push(personalData.name.trim())
-            if (filteredNames.length > availableSpace){
-                errorMessages.notAvailableSpace = true
-                this.setState({
-                    updateState: FAILED_STATE,
-                    errorMessages: errorMessages
-                })
-                return
-            }
-            const documentToSave = {
-                guests: filteredNames.toString(),
-                name: personalData.name.trim(),
-                phone: personalData.phone
-            }
-            const dbUrl = `/${reservationDate}/${reservationId}`
-            Firebase.database().ref(dbUrl).set(documentToSave)
-            this.setState({
-                updateState: COMPLETED_STATE
-            })
+            return el.name.trim()
         })
+        filteredNames.push(personalData.name.trim())
+        const kidsReservation = (
+            filteredNames.toString().match(/(niño)/g) || []
+        ).length
+
+        const availableSpace = currentWeek[currentWeekId][reservationDate].space
+        if ((filteredNames.length - kidsReservation) > availableSpace){
+            errorMessages.notAvailableSpace = true
+            this.setState({
+                updateState: FAILED_STATE,
+                errorMessages: errorMessages
+            })
+            return
+        }
+
+        const documentToSave = {
+            guests: filteredNames.toString(),
+            name: personalData.name.trim(),
+            phone: personalData.phone
+        }
+        const dbUrl = `/${currentWeekId}/${reservationDate}/${reservationId}`
+        Firebase.database().ref(dbUrl).set(documentToSave)
+
+        this.setState({
+            updateState: COMPLETED_STATE
+        })
+
     }
 
     handleClickDelete(){
         const {reservationDate, reservationId} = this.state
-        const dbUrl = `/${reservationDate}/${reservationId}`
+        const {currentWeekId} = this
+        const dbUrl = `/${currentWeekId}/${reservationDate}/${reservationId}`
         Firebase.database().ref(dbUrl).remove()
         this.setState({
             updateState: DELETED_STATE
+        })
+    }
+
+    componentDidMount(){
+        const {currentWeekId} = this
+        let ref = Firebase.database().ref(`/${currentWeekId}`)
+        ref.on('value', snapshot => {
+            const {currentWeek} = this.state
+            var weekRef = snapshot.val();
+            if (weekRef == null){
+                weekRef = {}
+            }
+            for (var dayRef in currentWeek[currentWeekId]){
+                var currentGuests = 0
+                const reservations = weekRef[dayRef] ? weekRef[dayRef] : {}
+                currentWeek[currentWeekId][dayRef].reservations = reservations
+                for (var reservation in reservations){
+                    const kidsCount = (
+                        reservations[reservation].guests.match(/(niño)/g) || []
+                    ).length
+                    const guestsFound = reservations[reservation].guests.split(",")
+                    currentGuests = currentGuests + guestsFound.length - kidsCount
+                }
+                const availableSpace = MAX_ALLOWED_GUESTS - currentGuests
+                currentWeek[currentWeekId][dayRef].space = availableSpace
+            }
+            this.setState({
+                currentWeek: currentWeek
+            })
         })
     }
 
@@ -281,7 +312,8 @@ class EditReservationForm extends Component {
             personalData,
             guests,
             errorMessages,
-            updateState
+            updateState,
+            currentWeek
         } = this.state
         const {
             handleDateChange,
@@ -297,15 +329,16 @@ class EditReservationForm extends Component {
         } = this
         return(
             <div className="registerForm">
-                <div className="guests-block">
-                    <div className="horizontal-block horizontal-space-block">
-                        <CustomDatePicker
-                            selectedDate={reservationDate}
+                <div className="edit-reservation-search-block">
+                    <div className="edit-reservation-date-picker">
+                        <CustomDayPicker
+                            currentWeek={currentWeek}
+                            selectedDay={reservationDate}
                             onDateSelected={handleDateChange}
-                            disabled={updateState === UNAVAILABLE_STATE}
+                            disabled={[FOUND_STATE, COMPLETED_STATE, DELETED_STATE, UNAVAILABLE_STATE].includes(updateState)}
                         />
                     </div>
-                    <div className="horizontal-block horizontal-space-block">
+                    <div className="edit-reservation-search-res-id">
                         <div className="custom-header-text">Código de reservación</div>
                         <input className="text-input" type="text" value={reservationId} onChange={handleReservationChange}/>
                     </div>
@@ -317,7 +350,8 @@ class EditReservationForm extends Component {
                         value={SEARCH_BUTTON}
                         onClick={handleClickSearch}
                         disabled={
-                            [FOUND_STATE, COMPLETED_STATE, DELETED_STATE, UNAVAILABLE_STATE].includes(updateState)
+                            [FOUND_STATE, COMPLETED_STATE, DELETED_STATE, UNAVAILABLE_STATE].includes(updateState) ||
+                            !reservationDate
                         }
                     />
                 </div>
