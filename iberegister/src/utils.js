@@ -54,6 +54,11 @@ export const getCurrentWeek = () => {
     nextSundayDate.setDate(nextSundayDate.getDate() + (14-nextSundayDate.getDay()) % 7)
 
     var currentDate = new Date()
+    if (currentDate.getDay() == 0 && currentDate.getHours() >= 12){
+        // if today is sunday and it's past 12 then reservation should be open for next week
+        nextSundayDate.setDate(nextSundayDate.getDate() + 1)
+        nextSundayDate.setDate(nextSundayDate.getDate() + (14-nextSundayDate.getDay()) % 7)
+    }
 
     const sundayStr = dateToString(nextSundayDate)
     const sundayAmStr = `${sundayStr}-9am`
