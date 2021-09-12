@@ -670,3 +670,11 @@ body {
     display: inline-block;
     vertical-align: top;
 }
+
+.available-space-text{
+    color: red;
+}
+
+.not-available-text{
+    color: white;
+}
