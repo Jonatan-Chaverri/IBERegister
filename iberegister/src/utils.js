@@ -37,6 +37,10 @@ export const isAvailableReservation = dateIn => {
         // if sunday morning
         return false
     }
+    if (currentDate.getDay() == 6 && currentDate.getHours() >= 22){
+        // if saturday after 10pm
+        return false
+    }
     return true
 }
 
