@@ -226,7 +226,8 @@ class RegisterForm extends Component {
                     const guestsFound = reservations[reservation].guests.split(",")
                     currentGuests = currentGuests + guestsFound.length - kidsCount
                 }
-                const availableSpace = MAX_ALLOWED_GUESTS - currentGuests
+                const availableSpace = MAX_ALLOWED_GUESTS - currentGuests > 0 ?
+                    MAX_ALLOWED_GUESTS - currentGuests : 0
                 currentWeek[currentWeekId][dayRef].space = availableSpace
             }
             this.setState({

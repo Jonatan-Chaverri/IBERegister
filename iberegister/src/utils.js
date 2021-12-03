@@ -70,6 +70,43 @@ export const getCurrentWeek = () => {
     const weekId = `v2-${sundayStr}`
 
     // Create output week reference
+    if (weekId === 'v2-2021-12-12'){
+        const out = {
+            [weekId]: {
+                [sundayPmStr]: {
+                    label: `Unánimes (${sundayStr.substring(5)}) 5:00pm`,
+                    available: isAvailableReservation(sundayStr),
+                    space: 0
+                },
+                [sundayAmStr]: {
+                    label: `Unánimes (${sundayStr.substring(5)}) 7:00pm`,
+                    available: isAvailableReservation(sundayStr),
+                    space: 0
+                },
+            }
+        }
+        return out
+    }
+
+    if (weekId === 'v2-2021-19-12'){
+        const out = {
+            [weekId]: {
+                [sundayPmStr]: {
+                    label: `Cantata (${sundayStr.substring(5)}) 4:00pm`,
+                    available: isAvailableReservation(sundayStr),
+                    space: 0
+                },
+                [sundayAmStr]: {
+                    label: `Cantata (${sundayStr.substring(5)}) 6:30pm`,
+                    available: isAvailableReservation(sundayStr),
+                    space: 0
+                },
+            }
+        }
+        return out
+    }
+
+
     const out = {
         [weekId]: {
             [sundayAmStr]: {
