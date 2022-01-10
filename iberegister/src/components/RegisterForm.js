@@ -37,6 +37,7 @@ class RegisterForm extends Component {
         this.currentWeekId = Object.keys(currentWeekInfo)[0]
 
         this.state = {
+            //reservationDate: "2022-16-1-11am",
             reservationDate: "",
             currentWeek: currentWeekInfo,
             guests: [
@@ -211,7 +212,7 @@ class RegisterForm extends Component {
         const {currentWeekId} = this
         let ref = Firebase.database().ref(`/${currentWeekId}`)
         ref.on('value', snapshot => {
-            const {currentWeek} = this.state
+            const {currentWeek, reservationDate} = this.state
             var weekRef = snapshot.val();
             if (weekRef == null){
                 weekRef = {}
@@ -229,9 +230,17 @@ class RegisterForm extends Component {
                 const availableSpace = MAX_ALLOWED_GUESTS - currentGuests
                 currentWeek[currentWeekId][dayRef].space = availableSpace
             }
-            this.setState({
-                currentWeek: currentWeek
-            })
+            if (Object.keys(currentWeek[currentWeekId]).length === 1){
+                this.setState({
+                    currentWeek: currentWeek,
+                    reservationDate: Object.keys(currentWeek[currentWeekId])[0]
+                })
+            } else{
+                this.setState({
+                    currentWeek: currentWeek
+                })
+            }
+
         })
     }
 

@@ -70,6 +70,20 @@ export const getCurrentWeek = () => {
     const weekId = `v2-${sundayStr}`
 
     // Create output week reference
+    if (weekId === 'v2-2022-16-1'){
+        const out = {
+            [weekId]: {
+                [sundayPmStr]: {
+                    label: `Asamblea (${sundayStr.substring(5)}) 10:00am`,
+                    available: isAvailableReservation(sundayStr),
+                    space: 0
+                }
+            }
+        }
+        return out
+    }
+
+    // Create output week reference
     const out = {
         [weekId]: {
             [sundayAmStr]: {
