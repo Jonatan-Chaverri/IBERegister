@@ -1,31 +1,35 @@
 import React, { Component } from 'react'
+
+// Check more icons at https://react-icons.github.io/react-icons/icons?name=fa
+import { FaCheckCircle, FaTimesCircle } from 'react-icons/fa'
+import FormatUnicorn from 'format-unicorn/safe'
+import "react-datepicker/dist/react-datepicker.css";
 import Firebase from "firebase/app"
 import 'firebase/database'
-import {MAX_ALLOWED_GUESTS, MAX_GUESTS_PER_RESERVATION} from "../config"
-import CustomDatePicker from './CustomDatePicker'
+
 import GuestsInputForm from './GuestsInputForm'
 import CustomDayPicker from './CustomDayPicker'
-import {nextAvailableDate, isValidName, isValidPhone, isAvailableReservation, getCurrentWeek} from '../utils'
+
+import { isValidName, isValidPhone, getCurrentWeek } from '../utils'
+import { MAX_GUESTS_PER_RESERVATION } from "../config"
+
+import {
+    FAILED_STATE,
+    COMPLETED_STATE,
+    PENDING_STATE,
+    UNAVAILABLE_STATE
+} from "../constants"
 
 import {
     NO_ROOM_ERROR,
     INVALID_NAME_ERROR,
     INVALID_PHONE_ERROR,
-    FAILED_STATE,
-    COMPLETED_STATE,
-    PENDING_STATE,
-    UNAVAILABLE_STATE,
+    INVALID_GUEST_NAME_ERROR,
     RESERVATION_BUTTON,
     RESERVATION_SUCCESS,
     RESERVATION_FAILED,
-    RESERVATION_WARNING,
-    UNAVAILABLE_DATE_MSG
-} from "../constants"
-
-// Check more icons at here https://react-icons.github.io/react-icons/icons?name=fa
-import { FaCheckCircle, FaTimesCircle } from 'react-icons/fa'
-
-import "react-datepicker/dist/react-datepicker.css";
+    RESERVATION_WARNING
+} from "../strings"
 
 
 class RegisterForm extends Component {
@@ -66,8 +70,11 @@ class RegisterForm extends Component {
         this.handleKidChange = this.handleKidChange.bind(this)
     }
 
+    /*
+     * Translate error flags to error messages to show to the user
+     */
     getReservationErrors(){
-        const {errorMessages, personalData} = this.state
+        const { errorMessages, personalData } = this.state
         if (errorMessages.notAvailableSpace){
             return NO_ROOM_ERROR
         }
@@ -80,12 +87,16 @@ class RegisterForm extends Component {
         const guestsValues = Object.values(errorMessages.guests)
         const guestError = guestsValues.indexOf(true)
         if (guestError !== -1){
-            return `El nombre del invitado ${guestError + 1} no es válido`
+            return FormatUnicorn(
+                INVALID_GUEST_NAME_ERROR,
+                { guests: guestError + 1 }
+            )
         }
         return false
     }
 
     createReservation(){
+        const { defaultCapacity } = this.props
         const {
             guests,
             personalData,
@@ -94,8 +105,9 @@ class RegisterForm extends Component {
             errorMessages,
             currentWeek
         } = this.state
+        const { getReservationErrors, currentWeekId } = this
 
-        const {getReservationErrors, currentWeekId} = this
+        // Check if there is any existing error on the reservation
         const reservationErrors = getReservationErrors()
         if (reservationErrors){
             this.setState({
@@ -111,20 +123,23 @@ class RegisterForm extends Component {
             return
         }
 
-        // Check out space
-        const availableSpace = currentWeek[currentWeekId][reservationDate].space
 
-        const filtered = guests.filter(el => {return el.name.length > 0})
+        // Parse the list of guests to string
+        const filtered = guests.filter(el => { return el.name.length > 0 })
         const filteredNames = filtered.map(el =>{
             if (el.kid){
                 return `${el.name.trim()} (niño)`
             }
             return el.name.trim()
         })
-
         filteredNames.push(personalData.name.trim())
+
         const guestStr = filteredNames.toString()
         const kidsCount = (guestStr.match(/(niño)/g) || []).length
+
+        // Check available space
+        const availableSpace = defaultCapacity -
+            currentWeek[currentWeekId][reservationDate].space
         if ((filteredNames.length - kidsCount) > availableSpace){
             errorMessages.notAvailableSpace = true
             this.setState({
@@ -138,22 +153,34 @@ class RegisterForm extends Component {
         const documentToSave = {
             guests: guestStr,
             name: personalData.name.trim(),
-            phone: personalData.phone
+            phone: personalData.phone,
+            timestamp: Date.now()
         }
         const dbUrl = `/${currentWeekId}/${reservationDate}/${reservationId}`
-        Firebase.database().ref(dbUrl).set(documentToSave)
 
-        this.setState({
-            reservationState: COMPLETED_STATE
-        })
+        Firebase.database().ref(dbUrl).set(documentToSave)
+            .then(() => {
+                this.setState({
+                    reservationState: COMPLETED_STATE
+                })
+            })
+            .catch((error) => {
+                this.setState({
+                    reservationState: FAILED_STATE
+                })
+            })
     }
 
+    /*
+     * Callback function for "add guest" button on UI.
+     * Adds one guest text input field to the UI.
+     */
     addGuestInput(){
-        let {guests, errorMessages} = this.state
+        let { guests, errorMessages } = this.state
         if (guests.length >= MAX_GUESTS_PER_RESERVATION){
             return
         }
-        guests.push({name: "", kid: false})
+        guests.push({ name: "", kid: false })
         errorMessages.guests.push(false)
         this.setState({
             errorMessages: errorMessages,
@@ -161,8 +188,11 @@ class RegisterForm extends Component {
         })
     }
 
+    /*
+     * Callback function for when there is a change in a guest name
+     */
     handleInputChange(index, value){
-        const {guests, errorMessages} = this.state
+        const { guests, errorMessages } = this.state
         errorMessages.guests[index] = value ? !isValidName(value) : false
         guests[index].name = value
         errorMessages.notAvailableSpace = false
@@ -172,8 +202,11 @@ class RegisterForm extends Component {
         })
     }
 
+    /*
+     * Callback function for when there is a change in the selected Date
+     */
     handleDateChange(selectedDate){
-        const {errorMessages} = this.state
+        const { errorMessages } = this.state
         errorMessages.notAvailableSpace = false
         this.setState({
             reservationDate: selectedDate,
@@ -181,12 +214,19 @@ class RegisterForm extends Component {
         })
     }
 
+    /*
+     * Callback function for when there is a change in reservations personal
+     * data
+     */
     handlePersonalDataChange(nameValue, phoneValue){
-        const{errorMessages} = this.state
+        const{ errorMessages } = this.state
         const formattedPhone = phoneValue.replace("-", "").replace(" ", "")
 
-        errorMessages.personalDataName = nameValue ? !isValidName(nameValue) : false
-        errorMessages.personalDataPhone = formattedPhone ? !isValidPhone(formattedPhone) : false
+        errorMessages.personalDataName = nameValue ?
+                !isValidName(nameValue) : false
+        errorMessages.personalDataPhone = formattedPhone ?
+                !isValidPhone(formattedPhone) : false
+
         this.setState({
             errorMessages: errorMessages,
             personalData: {
@@ -196,8 +236,11 @@ class RegisterForm extends Component {
         })
     }
 
+    /*
+     * Callback function for when a guest is selected (or deselected) as a kid
+     */
     handleKidChange(guestIndex){
-        const {guests} = this.state
+        const { guests } = this.state
         guests[guestIndex] = {
             name: guests[guestIndex].name,
             kid: !guests[guestIndex].kid
@@ -208,27 +251,33 @@ class RegisterForm extends Component {
     }
 
     componentDidMount(){
-        const {currentWeekId} = this
-        let ref = Firebase.database().ref(`/${currentWeekId}`)
-        ref.on('value', snapshot => {
-            const {currentWeek} = this.state
+        const { currentWeekId } = this
+
+        // Download all reservations for current week to get available space.
+        // We need to do this since there is no backend support :/
+        Firebase.database().ref(`/${currentWeekId}`).on('value', snapshot => {
+            const { currentWeek } = this.state
             var weekRef = snapshot.val();
             if (weekRef == null){
                 weekRef = {}
             }
+
             for (var dayRef in currentWeek[currentWeekId]){
                 var currentGuests = 0
                 const reservations = weekRef[dayRef] ? weekRef[dayRef] : {}
+
                 for (var reservation in reservations){
                     const kidsCount = (
                         reservations[reservation].guests.match(/(niño)/g) || []
                     ).length
                     const guestsFound = reservations[reservation].guests.split(",")
+                    // Kids should not be taken in consideration
                     currentGuests = currentGuests + guestsFound.length - kidsCount
                 }
-                const availableSpace = MAX_ALLOWED_GUESTS - currentGuests
-                currentWeek[currentWeekId][dayRef].space = availableSpace
+
+                currentWeek[currentWeekId][dayRef].space = currentGuests
             }
+
             this.setState({
                 currentWeek: currentWeek
             })
@@ -236,6 +285,7 @@ class RegisterForm extends Component {
     }
 
     render() {
+        const { defaultCapacity } = this.props
         const {
             reservationDate,
             reservationState,
@@ -255,56 +305,78 @@ class RegisterForm extends Component {
             handleKidChange,
             currentWeekId
         } = this
-        const availableSpace = reservationDate ? currentWeek[currentWeekId][reservationDate].space : 0
+        const availableSpace = reservationDate ?
+            defaultCapacity - currentWeek[currentWeekId][reservationDate].space : 0
         return (
-            <div className="registerForm">
-                <div className="date-selection-block">
+            <div className="register-form">
+                <div className="register-form__date-selection-container">
                     <CustomDayPicker
-                        currentWeek={currentWeek}
-                        selectedDay={reservationDate}
-                        onDateSelected={handleDateChange}
-                        disabled={reservationState === COMPLETED_STATE}
+                        currentWeek={ currentWeek }
+                        selectedDay={ reservationDate }
+                        defaultCapacity={ defaultCapacity }
+                        onDateSelected={ handleDateChange }
+                        disabled={ reservationState === COMPLETED_STATE }
                     />
                 </div>
-                <GuestsInputForm
-                    personalData={personalData}
-                    guests={guests}
-                    errorMessages={errorMessages}
-                    disabled={reservationState === COMPLETED_STATE || availableSpace <= 0}
-                    handlePersonalDataChange={handlePersonalDataChange}
-                    handleGuestInputChange={handleInputChange}
-                    onClickAddGuest={addGuestInput}
-                    handleKidChange={handleKidChange}
-                />
-                <div>
+
+                <div className="register-form__guest_input_container">
+                    <GuestsInputForm
+                        personalData={ personalData }
+                        guests={ guests }
+                        errorMessages={ errorMessages }
+                        disabled={
+                            reservationState === COMPLETED_STATE ||
+                            availableSpace <= 0
+                        }
+                        handlePersonalDataChange={ handlePersonalDataChange }
+                        handleGuestInputChange={ handleInputChange }
+                        onClickAddGuest={ addGuestInput }
+                        handleKidChange={ handleKidChange }
+                    />
+                </div>
+
+                <div className="register-form__button-add-reserve-container">
                     <input 
                         type="button" 
                         className="button-add-reserve"
-                        value={RESERVATION_BUTTON}
-                        disabled={reservationState === COMPLETED_STATE || availableSpace <= 0}
-                        onClick={createReservation}></input>
+                        value={ RESERVATION_BUTTON }
+                        disabled={
+                            reservationState === COMPLETED_STATE ||
+                            availableSpace <= 0
+                        }
+                        onClick={ createReservation }
+                    />
                 </div>
-                <div className="reservation-result-block-container">
+
+                <div>
                 {
                     ![PENDING_STATE, UNAVAILABLE_STATE].includes(reservationState) ?
                             <div className="reservation-result-block">
-                                <div className="reservation-status-block">
-                                    {reservationState === COMPLETED_STATE? 
-                                      <p>{RESERVATION_SUCCESS}  <FaCheckCircle className="icon-check-circle"/></p>:
-                                      <p>{RESERVATION_FAILED} <FaTimesCircle className="icon-fail-circle"/></p> }
+                                <div>
+                                    {
+                                        reservationState === COMPLETED_STATE ?
+                                        <p>
+                                            { RESERVATION_SUCCESS }
+                                            <FaCheckCircle className="icon-check-circle"/>
+                                        </p> :
+                                        <p>
+                                            { RESERVATION_FAILED }
+                                            <FaTimesCircle className="icon-fail-circle"/>
+                                        </p>
+                                    }
                                 </div>
                                 {
                                     reservationState === COMPLETED_STATE ?
-                                        <div className="reservation-number-block">
+                                        <div>
                                             <div className="reservation-number-block-warning">
-                                                {RESERVATION_WARNING}
+                                                { RESERVATION_WARNING }
                                             </div>
                                             <div>
-                                                Código de reservación: {reservationId}
+                                                Código de reservación: { reservationId }
                                             </div>
                                         </div> :
                                         <div className="reservation-number-block-error">
-                                            {getReservationErrors()}
+                                            { getReservationErrors() }
                                         </div>
                                 }
                             </div>

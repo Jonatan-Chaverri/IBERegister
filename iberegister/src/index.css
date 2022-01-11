@@ -4,106 +4,81 @@ body {
     min-width: 390px;
 }
 
-/* Add a black background color to the top navigation */
-.topnav {
+/* Header Bar component CSS */
+.header-menu {
   background: rgb(2,0,36);
-  background: linear-gradient(90deg, rgba(2,0,36,1) 0%, rgba(9,9,121,1) 32%, rgba(0,212,255,1) 100%);
-  overflow: hidden;
+  background: linear-gradient(
+    90deg,
+    rgba(2,0,36,1) 0%,
+    rgba(9,9,121,1) 32%,
+    rgba(0,212,255,1) 100%
+  );
 }
 
-/* Style the links inside the navigation bar */
-.topnav label {
-  float: left;
+.header-menu label {
+  display: inline-block;
   color: white;
   text-align: center;
   padding: 14px 16px;
-  text-decoration: none;
   font-size: 20px;
 }
 
-@media(max-width: 450px){
-  .topnav label {
-    float: left;
-    color: white;
-    text-align: center;
-    padding: 14px 16px;
-    text-decoration: none;
-    font-size: 17px;
+@media(max-width: 440px) {
+  .header-menu label {
+    padding: 14px 12px;
+    font-size: 18px;
   }
 }
 
-@media(max-width: 390px){
-  .topnav label {
-    float: left;
-    color: white;
-    text-align: center;
-    padding: 14px 16px;
-    text-decoration: none;
-    font-size: 14px;
+@media(max-width: 390px) {
+  .header-menu label {
+    padding: 14px 12px;
+    font-size: 17px;
     font-weight: bold;
   }
 }
 
-/* Change the color of links on hover */
-.topnav label:hover {
+.header-menu label:hover {
   background-color: #FFFFFF;
   color: #13ace5;
 }
 
-/* Add a color to the active/current link */
-.topnav label.active {
+.header-menu label.active {
   background-color: #13ace5;
   color: white;
 }
 
+/* Home header component CSS */
 .header-layout {
     background-image: url("images/frontpage.jpg");
-    height:250px;
+    background-size: cover;
+    height:230px;
     width: 100%;
     min-width: 200px;
-    box-shadow: 0px 2px 2px black;
-    margin: 0px;
+    vertical-align: top;
 }
 
-
-.registerForm{
-  padding-top: 20px;
-  padding-left: 20px;
-  padding-bottom: 50px;
-}
-
-.registerTable{
-  text-align: left;
-}
-
-.header-photo{
-    width: 10%;
-    height: 70%;
+.header-img-container {
+    max-width: 180px;
+    height: 180px;
     padding-top: 30px;
     padding-left: 20px;
-    min-width: 180px;
+    display: inline-block;
+    margin-right: 10px;
+    vertical-align: top;
 }
 
-.header-data {
-    width: 90%;
-    height: 95%;
-    display:flex;
-    flex-direction: row;
-    align-self: stretch;
-}
-
-@media(max-width: 650px){
-    .header-data {
-        width: 90%;
-        height: 95%;
-    }
+.header-img {
+    max-width: 95%;
+    max-height: 95%;
 }
 
 .header-text {
     color: black;
-    height: 90%;
-    width: 80%;
-    padding-left: 20px;
+    height: 50%;
+    width: 40%;
+    display: inline-block;
+    margin-top: 20px;
 }
 
 .header-name {
@@ -112,19 +87,15 @@ body {
     font-weight: bold;
 }
 
-@media(max-width: 635px){
+@media(max-width: 835px) {
     .header-name {
-        font-size: 30px;
         height: 40px;
-        font-weight: bold;
     }
 }
 
-@media(max-width: 480px){
+@media(max-width: 510px) {
     .header-name {
-        font-size: 30px;
         height: 80px;
-        font-weight: bold;
     }
 }
 
@@ -133,6 +104,438 @@ body {
     height: 10px;
 }
 
+/* RegisterForm component CSS */
+.register-form {
+  padding-top: 20px;
+  padding-left: 20px;
+  padding-bottom: 50px;
+}
+
+.register-form__date-selection-container {
+  padding-bottom: 20px;
+}
+
+.register-form__guest_input_container {
+    margin-bottom: 20px;
+}
+
+.register-form__button-add-reserve-container {
+    margin-bottom: 20px;
+}
+
+.registerTable {
+  text-align: left;
+}
+
+/* Titles style */
+.section-title {
+    font-size: 18px;
+    font-family: "Montserrat", sans-serif;
+    font-weight: bold;
+    padding-bottom: 10px;
+}
+
+.section-title::before {
+    display: inline-block;
+    content: "";
+    border-top: .3rem solid #13ace5;
+    width: 1.5rem;
+    margin: 0 0.5rem;
+    padding-bottom: 20px;
+    transform: translateY(1rem);
+}
+
+.custom-subtitle {
+  padding-top: 20px;
+  color: red;
+  font-family: "Montserrat", sans-serif;
+  font-size: 14px;
+  text-decoration: underline;
+}
+
+/* Guest input component CSS */
+.guest-input-form__personal-data-container {
+  display: inline-block;
+  padding-right: 30px;
+  font-size: 14px;
+  vertical-align: top;
+}
+
+.guest-input-form__input-block {
+  width: 220px;
+  padding-bottom: 5px;
+}
+
+.guest-input-form__input-error-container {
+  width: 220px;
+  background: rgba(196, 3, 3, 0.6);
+}
+
+.guest-input-form__input-error {
+  padding: 3px 3px 3px 3px;
+}
+
+.guest-input-form__guests-container {
+  display: inline-block;
+}
+
+.guest-input-form__button-add-more:enabled {
+  background-color: #38AF21;
+  font-size: 15px;
+  font-family: "Raleway", sans-serif;
+  font-weight: bold;
+  color: white;
+  padding: 0px 20px 0px 20px;
+  border: 1px solid rgba(0,0,0,0.21);
+  border-bottom: 4px solid rgba(0,0,0,0.21);
+  border-radius: 4px;
+  text-shadow: 0 1px 0 rgba(0,0,0,0.15);
+}
+
+.guest-input-form__button-add-more:disabled {
+  background-color: #807C7C;
+  font-size: 15px;
+  font-family: "Raleway", sans-serif;
+  font-weight: bold;
+  color: white;
+  padding: 0px 20px 0px 20px;
+  border: 1px solid rgba(0,0,0,0.21);
+  border-bottom: 4px solid rgba(0,0,0,0.21);
+  border-radius: 4px;
+  text-shadow: 0 1px 0 rgba(0,0,0,0.15);
+}
+
+.guest-input-form__button-add-more:hover:enabled {
+  background-color: #FFF;
+  font-size: 15px;
+  font-family: "Raleway", sans-serif;
+  color: #13ace5;
+  padding: 0px 20px 0px 20px;
+  border: 1px solid rgba(0,0,0,0.21);
+  border-bottom: 4px solid rgba(0,0,0,0.21);
+  border-radius: 4px;
+  text-shadow: 0 1px 0 rgba(0,0,0,0.15);
+}
+
+.guest-input-form__left-title {
+  text-align: left;
+}
+
+/* Footer component CSS */
+.footer {
+    height: 100px;
+    width: 100%;
+    background-color: #EFF1F4;
+    padding-top: 50px;
+    padding-left: 20px;
+}
+
+.footer__text {
+    font-size: 15px;
+}
+
+/* Date Picker component CSS */
+.day-picker__dates_container {
+  margin-bottom: 10px;
+}
+
+.day-picker__date_block {
+  display: inline-block;
+  min-width: 100px;
+  min-height: 60px;
+  padding-right: 10px;
+}
+
+@media(max-width: 391px) {
+    .day-picker__date_block {
+      padding-top: 10px;
+    }
+}
+
+.day-picker__selection {
+    width: 130px;
+    height: 60px;
+    min-width: 50px;
+    padding: 5px 5px 5px 5px;
+    position: relative;
+    text-align: center;
+    background: rgb(244,242,242);
+    background: radial-gradient(circle, rgba(244,242,242,1) 0%, rgba(224,217,218,1) 71%);
+    font-size: 17px;
+    font-family: "Raleway", sans-serif;
+    font-weight: bold;
+    border-radius: 10px;
+    border: 2px solid black;
+}
+
+.day-picker__selection-selected {
+    width: 130px;
+    height: 60px;
+    min-width: 50px;
+    padding: 5px 5px 5px 5px;
+    position: relative;
+    text-align: center;
+    background: #13ace5;
+    color: white;
+    font-size: 17px;
+    font-family: "Raleway", sans-serif;
+    font-weight: bold;
+    border-radius: 10px;
+    border: 2px solid black;
+}
+
+.day-picker__selection-disabled {
+    width: 130px;
+    height: 60px;
+    min-width: 50px;
+    padding: 5px 5px 5px 5px;
+    position: relative;
+    text-align: center;
+    background: gray;
+    color: black;
+    font-size: 17px;
+    font-family: "Raleway", sans-serif;
+    font-weight: bold;
+    border-radius: 10px;
+    border: 2px solid black;
+}
+
+.day-picker__selection:hover {
+    background: #13ace5;
+}
+
+.day-picker__available-space-text {
+    color: red;
+}
+
+.day-picker__not-available-text {
+    color: white;
+}
+
+/* Edit form component CSS */
+.edit-form {
+    padding-top: 20px;
+    padding-left: 20px;
+    padding-bottom: 50px;
+}
+
+.edit-form__search-block {
+    margin-bottom: 15px;
+}
+
+.edit-form__date-selection-block {
+    display: inline-block;
+    margin: 0px 30px 0px 0px;
+}
+
+.edit-form__res-code-input-block {
+    display: inline-block;
+    vertical-align: top;
+}
+
+.edit-form__res-search-error-message-block {
+  color:red;
+  font-size: 17px;
+  margin: 10px 0px 20px 0px;
+}
+
+.edit-form__update-delete-buttons-block {
+  padding-top: 20px;
+  padding-bottom: 20px;
+}
+
+.edit-form__update-delete-buttons-block div {
+    display: inline-block;
+    margin: 0px 10px 0px 0px;
+}
+
+/* Login component CSS */
+.login {
+    width: 100vw;
+    height: 100vh;
+    background-image: url('./images/logo.png');
+    background-size: auto;
+    background-repeat: no-repeat;
+    background-position: center;
+}
+
+.login__block {
+    margin: auto;
+    max-width: 500px;
+    margin-top: 20px;
+    padding: 10px 10px 10px 10px;
+    border: 2px solid black;
+}
+
+.login__title {
+    font-size: 1.5rem;
+    font-family: "Montserrat", sans-serif;
+    font-weight: bold;
+    text-align: center;
+    background: rgb(2,0,36);
+    background: linear-gradient(
+        90deg,
+        rgba(2,0,36,1) 0%,
+        rgba(9,9,121,1) 32%,
+        rgba(0,212,255,1) 100%
+    );
+    color: white;
+    padding: 10px 10px 10px 10px;
+}
+
+.login__input-block {
+    margin: 20px 0px 20px 0px;
+}
+
+.login__subtitle-block {
+    display: inline-block;
+    margin: 0px 20px 10px 0px;
+    width: 22%;
+    min-width: 70px;
+}
+
+.login__text-input-block {
+    display: inline-block;
+    margin: 0px 0px 10px 0px;
+    width: 65%;
+}
+
+.login__result-block {
+    margin: 20px 0px 0px 0px;
+    color: red;
+    font-size: 1.2rem;
+}
+
+/* Admin component CSS */
+.admin__reservations-display {
+    margin: 70px 0px 20px 20px;
+}
+
+.admin__settings-block {
+    margin: 70px 0px 0px 20px;
+}
+
+/* Admin reservations component CSS */
+.admin-res__date-block {
+    margin-bottom: 20px;
+}
+
+.admin-res__summary-block {
+    margin-bottom: 20px;
+    font-size: 1rem;
+    color: green;
+}
+
+.admin-res__summary-block div {
+    margin-bottom: 5px;
+}
+
+/* Reservation display component CSS */
+.res-display__table {
+  text-align: left;
+  border: 1px solid black;
+}
+
+.res-display__table-filters-block {
+    margin-bottom: 20px;
+    font-size: 1rem;
+}
+
+.res-display__table-filters-block div {
+    display: inline-block;
+    margin: 5px 20px 0px 0px;
+}
+
+.res-display__table-headers th {
+  font-weight: bold;
+  background-color: #13ace5;
+  padding-top: 10px;
+  padding-bottom: 10px;
+  padding-left: 5px;
+}
+
+.res-display__table-small-col {
+    padding-right: 60px;
+}
+
+.res-display__table-normal-col {
+    padding-right: 150px;
+}
+
+.res-display__table-row-content {
+  white-space: pre;
+  padding: 10px 10px 10px 10px;
+}
+
+.table-item-dark {
+    background-color: #F3EDED;
+}
+
+/* Admin header component CSS */
+.admin-header {
+  position: fixed;
+  width: 100vw;
+  top: 0;
+}
+
+.admin-header__side-menu {
+    background: rgba(255, 255, 255, 0.9);
+    position: fixed;
+    width: 50vw;
+    min-width: 230px;
+    border: 2px solid black;
+    top: 48px;
+    left: 2px;
+    z-index: 100;
+}
+
+.admin-header__side-menu-closed {
+    display: none;
+}
+
+.admin-header__side-menu-item {
+    display: block;
+    padding: 20px 0px 20px 5px;
+    font-size: 1.2rem;
+    border-bottom: 1px solid black;
+}
+
+.admin-header__side-menu-item:hover {
+    display: block;
+    padding: 20px 0px 20px 5px;
+    font-size: 1.2rem;
+    border-bottom: 1px solid black;
+    background-color: rgba(9,9,121,1);
+    color: white;
+    cursor: pointer;
+}
+
+/* Admin settings component CSS */
+.admin-settings__capacity-input-block {
+    display: inline-block;
+    max-width: 60px;
+}
+
+.admin-settings__subtitle {
+    display: inline-block;
+    margin-right: 10px;
+}
+
+.admin-settings__capacity-block {
+    margin-top: 10px;
+}
+
+.admin-settings__update-capacity-button-block {
+    margin-top: 20px;
+}
+
+
+.admin-setting__update-capacity-msg {
+    margin-top: 20px;
+    color: red;
+}
+
+/* Other custom components CSS */
 .custom-select {
   background-color: #898989;
   color: white;
@@ -143,8 +546,15 @@ body {
   box-sizing: border-box;
 }
 
-/* class applies to select element itself, not a wrapper element */
-.select-css:enabled{
+.icon-check-circle {
+    color: #20A50B;
+}
+
+.icon-fail-circle {
+    color: red;
+}
+
+.select-css:enabled {
     display: block;
     font-size: 14px;
     font-family: "Montserrat", sans-serif;
@@ -198,119 +608,101 @@ body {
     background-size: .65em auto, 100%;
 }
 
-/* Hide arrow icon in IE browsers */
 .select-css::-ms-expand {
     display: none;
 }
-/* Hover style */
+
 .select-css:hover:enabled {
     border-color: #888;
 }
-/* Focus style */
+
 .select-css:focus {
     border-color: #aaa;
     /* It'd be nice to use -webkit-focus-ring-color here but it doesn't work on box-shadow */
     box-shadow: 0 0 1px 3px rgba(59, 153, 252, .7);
     box-shadow: 0 0 0 3px -moz-mac-focusring;
-    color: #222; 
+    color: #222;
     outline: none;
 }
 
-/* Set options to normal weight */
 .select-css option {
     font-weight:normal;
 }
 
-.custom-header-text{
-    font-size: 18px;
-    font-family: "Montserrat", sans-serif;
+.reservation-result-block {
+    padding: 5px 5px 10px 10px;
+    color: black;
+    font-size: 17px;
     font-weight: bold;
-    padding-bottom: 10px;
+    border-radius: 5px;
+    background: radial-gradient(circle, rgba(244,242,242,1) 0%, rgba(224,217,218,1) 71%);
+    max-width: 500px;
+    min-height: 110px;
 }
 
-.custom-header-text::before{
-    display: inline-block;
-    content: "";
-    border-top: .3rem solid #13ace5;
-    width: 1.5rem;
-    margin: 0 0.5rem;
-    padding-bottom: 20px;
-    transform: translateY(1rem);
+@media(max-width: 550px) {
+    .reservation-result-block{
+        max-width: 400px;
+    }
 }
 
-.date-selection-block{
-  padding-bottom: 30px;
+@media(max-width: 440px) {
+    .reservation-result-block{
+        max-width: 340px;
+    }
 }
 
+.reservation-number-block-warning {
+    font-size: 12px;
+    color: #7E5C24;
+}
 
-.custom-subtitle{
-  padding-top: 20px;
-  color: red;
-  font-family: "Montserrat", sans-serif;
-  font-size: 14px;
+.reservation-number-block-error {
+    font-size: 15px;
+    color: #AA0E04;
+}
+
+.reservation-result-hidden {
+  padding: 5px 5px 10px 10px;
+  min-height: 110px;
+  max-width: 500px;
+  border-radius: 5px;
+  background: rgb(244,242,242);
+  background: radial-gradient(circle, rgba(244,242,242,1) 0%, rgba(224,217,218,1) 71%);
+}
+
+@media(max-width: 550px) {
+    .reservation-result-hidden{
+        max-width: 400px;
+    }
+}
+
+@media(max-width: 440px) {
+    .reservation-result-hidden{
+        max-width: 340px;
+    }
+}
+
+.text-success {
+  color: #02682D;
   text-decoration: underline;
 }
 
-.guest-reservation-block{
-  width: 100%;
-  margin: 0 auto;
+.text-error {
+  color: red;
+  text-decoration: underline;
 }
 
-.personal-data-block{
-  display: inline-block;
-  padding-right: 50px;
-  float: left;
-  font-size: 14px;
-}
-
-.guests-block{
-  display: inline-block;
-}
-
-.input-block{
-  width: 220px;
-  padding-bottom: 5px;
-}
-
-.button-add-more:enabled{
-  background-color: #38AF21;
+.text-input {
+  border-radius: 6px;
   font-size: 15px;
-  font-family: "Raleway", sans-serif;
-  font-weight: bold;
-  color: white;
-  padding: 0px 20px 0px 20px;
-  border: 1px solid rgba(0,0,0,0.21);
-  border-bottom: 4px solid rgba(0,0,0,0.21);
-  border-radius: 4px;
-  text-shadow: 0 1px 0 rgba(0,0,0,0.15);
+  width: 95%;
+  padding-top: 3px;
+  padding-bottom: 3px;
 }
 
-.button-add-more:disabled{
-  background-color: #807C7C;
-  font-size: 15px;
-  font-family: "Raleway", sans-serif;
-  font-weight: bold;
-  color: white;
-  padding: 0px 20px 0px 20px;
-  border: 1px solid rgba(0,0,0,0.21);
-  border-bottom: 4px solid rgba(0,0,0,0.21);
-  border-radius: 4px;
-  text-shadow: 0 1px 0 rgba(0,0,0,0.15);
-}
-
-.button-add-more:hover:enabled{
-  background-color: #FFF;
-  font-size: 15px;
-  font-family: "Raleway", sans-serif;
-  color: #13ace5;
-  padding: 0px 20px 0px 20px;
-  border: 1px solid rgba(0,0,0,0.21);
-  border-bottom: 4px solid rgba(0,0,0,0.21);
-  border-radius: 4px;
-  text-shadow: 0 1px 0 rgba(0,0,0,0.15);
-}
-
-.button-add-reserve{
+/* Buttons style */
+.button-add-reserve {
   background-color: #13ace5;
   font-size: 15px;
   font-family: "Raleway", sans-serif;
@@ -322,7 +714,7 @@ body {
   border-radius: 4px;
 }
 
-.button-add-reserve:disabled{
+.button-add-reserve:disabled {
   background-color: #807C7C;
   font-size: 15px;
   font-family: "Raleway", sans-serif;
@@ -334,7 +726,7 @@ body {
   border-radius: 4px;
 }
 
-.button-add-reserve:hover:enabled{
+.button-add-reserve:hover:enabled {
   background-color: white;
   font-size: 15px;
   color: #13ace5;
@@ -344,7 +736,7 @@ body {
   border-radius: 4px;
 }
 
-.button-warning{
+.button-warning {
   background-color: #DE300B;
   font-size: 15px;
   font-family: "Raleway", sans-serif;
@@ -356,7 +748,7 @@ body {
   border-radius: 4px;
 }
 
-.button-warning:hover:enabled{
+.button-warning:hover:enabled {
   background-color: #E7E7E7;
   font-size: 15px;
   color: black;
@@ -366,7 +758,7 @@ body {
   border-radius: 4px;
 }
 
-.button-warning:disabled{
+.button-warning:disabled {
   background-color: #807C7C;
   font-size: 15px;
   font-family: "Raleway", sans-serif;
@@ -376,305 +768,4 @@ body {
   border: 1px solid rgba(0,0,0,0.21);
   border-bottom: 4px solid rgba(0,0,0,0.21);
   border-radius: 4px;
-}
-
-.bottomnav{
-    height: 100px;
-    width: 100%;
-    background-color: #EFF1F4;
-    padding-top: 50px;
-    padding-left: 20px;
-}
-
-.footer-text{
-    font-size: 15px;
-}
-
-.reservation-result-block-container{
-    padding-top: 20px;
-}
-
-.reservation-result-block{
-    padding: 5px 5px 10px 10px;
-    color: black;
-    font-size: 17px;
-    font-weight: bold;
-    border-radius: 5px;
-    background: rgb(244,242,242);
-    background: radial-gradient(circle, rgba(244,242,242,1) 0%, rgba(224,217,218,1) 71%);
-    max-width: 500px;
-    min-height: 110px;
-}
-
-@media(max-width: 550px){
-    .reservation-result-block{
-        padding: 5px 5px 10px 10px;
-        color: black;
-        font-size: 17px;
-        font-weight: bold;
-        border-radius: 5px;
-        background: rgb(244,242,242);
-        background: radial-gradient(circle, rgba(244,242,242,1) 0%, rgba(224,217,218,1) 71%);
-        max-width: 400px;
-        min-height: 110px;
-    }
-}
-
-@media(max-width: 440px){
-    .reservation-result-block{
-        padding: 5px 5px 10px 10px;
-        color: black;
-        font-size: 17px;
-        font-weight: bold;
-        border-radius: 5px;
-        background: rgb(244,242,242);
-        background: radial-gradient(circle, rgba(244,242,242,1) 0%, rgba(224,217,218,1) 71%);
-        max-width: 340px;
-        min-height: 110px;
-    }
-}
-
-.icon-check-circle{
-    color: #20A50B;
-}
-
-.icon-fail-circle{
-    color: red;
-}
-
-.reservation-number-block-warning{
-    font-size: 12px;
-    color: #7E5C24;
-}
-
-.reservation-number-block-error{
-    font-size: 15px;
-    color: #AA0E04;
-}
-
-.input-error-container{
-  width: 220px;
-  background: rgba(196, 3, 3, 0.6);
-}
-
-.input-error{
-  padding: 3px 3px 3px 3px;
-}
-
-.reservation-result-hidden{
-  padding: 5px 5px 10px 10px;
-  min-height: 110px;
-  max-width: 500px;
-  border-radius: 5px;
-  background: rgb(244,242,242);
-  background: radial-gradient(circle, rgba(244,242,242,1) 0%, rgba(224,217,218,1) 71%);
-}
-
-@media(max-width: 550px){
-    .reservation-result-hidden{
-        padding: 5px 5px 10px 10px;
-        min-height: 110px;
-        max-width: 400px;
-        border-radius: 5px;
-        background: rgb(244,242,242);
-        background: radial-gradient(circle, rgba(244,242,242,1) 0%, rgba(224,217,218,1) 71%);
-    }
-}
-
-@media(max-width: 440px){
-    .reservation-result-hidden{
-        padding: 5px 5px 10px 10px;
-        min-height: 110px;
-        max-width: 340px;
-        border-radius: 5px;
-        background: rgb(244,242,242);
-        background: radial-gradient(circle, rgba(244,242,242,1) 0%, rgba(224,217,218,1) 71%);
-    }
-}
-
-.main-block{
-  padding-top: 20px;
-  padding-bottom: 20px;
-}
-
-.horizontal-block{
-  display: inline-block;
-  padding-right: 10px;
-}
-
-.horizontal-space-block{
-  padding-right: 40px;
-}
-
-.error-message{
-  color:red;
-  font-size: 15px;
-}
-
-.text-success {
-  color: #02682D;
-  text-decoration: underline;
-}
-
-.text-error{
-  color: red;
-  text-decoration: underline;
-}
-
-.text-input{
-  border-radius: 6px;
-  font-size: 15px;
-  width: 95%;
-  padding-top: 3px;
-  padding-bottom: 3px;
-}
-
-.age-input{
-  border-radius: 6px;
-  font-size: 15px;
-  width: 15%;
-  padding-top: 3px;
-  padding-bottom: 3px;
-}
-
-.admin-header-bar{
-  width: 100%;
-  height: 100px;
-}
-
-.table-left {
-  text-align: left;
-}
-
-.display-reservations-table{
-  text-align: left;
-  border: 1px solid black;
-}
-
-.display-reservations-table-th{
-  padding-right: 150px;
-  font-weight: bold;
-  background-color: #13ace5;
-  padding-top: 10px;
-  padding-bottom: 10px;
-  padding-left: 5px;
-}
-
-.display-reservations-table-td{
-  padding-right: 150px;
-  padding-bottom: 10px;
-  white-space: pre;
-}
-
-.small-title{
-  font-size: 13px;
-}
-
-.table-center{
-  text-align: center;
-}
-
-.container-day-picker{
-  display: block;
-  margin-bottom: 60px;
-}
-
-@media(max-width: 391px){
-  .container-day-picker{
-    display: block;
-    margin-bottom: 120px;
-  }
-}
-
-.day-picker-container{
-  display: block;
-  float: left;
-  min-width: 100px;
-  min-height: 60px;
-  padding-right: 10px;
-}
-
-@media(max-width: 391px){
-    .day-picker-container{
-      display: block;
-      float: left;
-      min-width: 100px;
-      min-height: 60px;
-      padding-right: 10px;
-      padding-top: 10px;
-    }
-}
-
-.day-selection{
-    width: 130px;
-    height: 60px;
-    min-width: 50px;
-    padding: 5px 5px 5px 5px;
-    position: relative;
-    text-align: center;
-    background: rgb(244,242,242);
-    background: radial-gradient(circle, rgba(244,242,242,1) 0%, rgba(224,217,218,1) 71%);
-    font-size: 17px;
-    font-family: "Raleway", sans-serif;
-    font-weight: bold;
-    border-radius: 10px;
-    border: 2px solid black;
-}
-
-.day-selection-selected{
-    width: 130px;
-    height: 60px;
-    min-width: 50px;
-    padding: 5px 5px 5px 5px;
-    position: relative;
-    text-align: center;
-    background: #13ace5;
-    color: white;
-    font-size: 17px;
-    font-family: "Raleway", sans-serif;
-    font-weight: bold;
-    border-radius: 10px;
-    border: 2px solid black;
-}
-
-.day-selection-disabled{
-    width: 130px;
-    height: 60px;
-    min-width: 50px;
-    padding: 5px 5px 5px 5px;
-    position: relative;
-    text-align: center;
-    background: gray;
-    color: black;
-    font-size: 17px;
-    font-family: "Raleway", sans-serif;
-    font-weight: bold;
-    border-radius: 10px;
-    border: 2px solid black;
-}
-
-.day-selection:hover{
-    background: #13ace5;
-}
-
-.edit-reservation-search-block{
-    display: block;
-}
-
-.edit-reservation-date-picker{
-    display: inline-block;
-    margin: 0px 30px 0px 0px;
-}
-
-.edit-reservation-search-res-id{
-    display: inline-block;
-    vertical-align: top;
-}
-
-.available-space-text{
-    color: red;
-}
-
-.not-available-text{
-    color: white;
 }

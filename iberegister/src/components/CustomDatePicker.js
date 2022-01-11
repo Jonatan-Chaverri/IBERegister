@@ -1,5 +1,5 @@
 import React, { Component } from 'react'
-import {nextAvailableDate, isAvailableReservation} from '../utils'
+
 
 class CustomDatePicker extends Component {
 
@@ -9,14 +9,26 @@ class CustomDatePicker extends Component {
     }
 
     render(){
-        const {selectedDate, onDateSelected, datesOptions, disabled} = this.props
+        const {
+            selectedDate,
+            onDateSelected,
+            datesOptions,
+            disabled
+        } = this.props
         return(
-            <div className="custom-date-picker">
-                <div className="custom-header-text">Fecha de reservación</div>
-                <select className="select-css" value={selectedDate} onChange={onDateSelected} disabled={disabled}>
+            <div>
+                <div className="section-title">Fecha de reservación</div>
+                <select
+                    className="select-css"
+                    value={ selectedDate }
+                    onChange={ onDateSelected }
+                    disabled={ disabled }
+                >
                 {
                     datesOptions.map(el => {
-                        return (<option value={el} key={el}>{el}</option>)
+                        return (
+                            <option value={ el } key={ el }>{ el }</option>
+                        )
                     })
                 }
                 </select>
