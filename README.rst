@@ -2,11 +2,29 @@
 IBE Register
 ============
 
-IBE Register is a web application to enable guest registration to attend to
-local church services every Sunday.
+IBE Register is a Web Application that serves as a self registration tool for church members that wants to attend church services, allowing them to reserve a certain amount of spaces for the service. 
+
+It was developed during COVID pandemic to ensure the fulfillment of capacity restrictions imposed at the time by the goverment. 
+
+Prerequisites
+=============
+
+1. Set a new Firebase project in Firebase website
+2. Set a new real time database in Firebase
+3. Copy/paste configurations to config.js file.
+4. Set at least one user in firebase authentication console to act as an "admin". Project is configured to accept email and password as credentials.
 
 Deploy
 ======
 
 1. Build the project
+
+```
+yarn build
+```
+
 2. Deploy to firebase
+
+```
+Firebase deploy
+```
