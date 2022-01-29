@@ -28,3 +28,11 @@ yarn build
 ```
 Firebase deploy
 ```
+
+Navigation
+==========
+
+There are two main views, one for the guests that are going to make reservations and the other just for the admins that will be checking those reservations.
+
+- *https://<project_url>/* to make reservations.
+- *https://<project_url/admin* for system admins, authentication is done using Firebase authentication features. 
