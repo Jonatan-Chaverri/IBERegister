@@ -6,7 +6,7 @@ IBE Register is a Web Application that serves as a self registration tool for ch
 
 It was developed during COVID pandemic to ensure the fulfillment of capacity restrictions imposed at the time by the goverment. 
 
-The app is being used by a local church, you can see it in action [here](https://iberegistro.web.app)
+The app is currently being used by a local church, you can see it in action in this site https://iberegistro.web.app
 
 Prerequisites
 =============
